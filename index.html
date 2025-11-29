@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Kostyuk Project | Show & School</title>
+<title>Kostyuk Project | Premium Magic</title>
 
-<meta name="description" content="Премиальное шоу иллюзиониста Дмитрия Костюка и Школа магии.">
+<meta name="description" content="Премиальное шоу иллюзиониста Дмитрия Костюка.">
 <meta property="og:title" content="Kostyuk Project">
 <meta property="og:image" content="images/hero-portrait.png">
 <meta name="theme-color" content="#050505">
@@ -138,8 +138,8 @@ body {
 label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 0.05em; }
 
 /* === HEADER === */
-.header { position: fixed; top: 0; inset-inline: 0; z-index: 100; padding: 20px 0; transition: 0.4s; }
-.header.scrolled { background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.header { position: fixed; top: 0; inset-inline: 0; z-index: 100; padding: 15px 0; transition: 0.4s; }
+.header.scrolled { background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .nav-flex { display: flex; justify-content: space-between; align-items: center; }
 .logo { font-family: var(--ff-head); font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; }
 .logo span { color: var(--gold-primary); margin-left: 5px; }
@@ -149,18 +149,43 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .burger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
 .burger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
 
-/* === MOBILE MENU (UPDATED) === */
+/* === SPLIT MENU (NEW DESIGN) === */
 .mobile-menu {
   position: fixed; inset: 0; background: #000; z-index: 99;
-  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1.5rem;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem;
   transform: translateY(-100%); transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 40px 20px; overflow-y: auto;
+  padding: 20px;
 }
 .mobile-menu.open { transform: translateY(0); }
-.menu-group-title { font-size: 0.8rem; text-transform: uppercase; color: #666; margin-top: 20px; letter-spacing: 0.1em; border-bottom: 1px solid #333; padding-bottom: 5px; width: 200px; text-align: center; }
-.menu-link { font-family: var(--ff-head); font-size: 1.8rem; color: #fff; opacity: 0.8; text-decoration: none; transition: 0.3s; }
-.menu-link:hover { color: var(--gold-primary); opacity: 1; transform: scale(1.05); }
-.menu-link.highlight { color: var(--gold-primary); }
+
+/* Menu Cards */
+.nav-card {
+  width: 100%; max-width: 400px;
+  padding: 40px 30px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  text-decoration: none;
+  text-align: center;
+  transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.nav-card:hover { transform: translateY(-5px); }
+
+/* Event Card Style */
+.nav-card.gold { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(0,0,0,0.8)); border-color: var(--gold-primary); }
+.nav-card.gold:hover { box-shadow: 0 10px 40px rgba(212,175,55,0.2); }
+.nav-card.gold h3 { color: #fff; }
+.nav-card.gold span { color: var(--gold-primary); }
+
+/* School Card Style */
+.nav-card.silver { background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.8)); border-color: #fff; }
+.nav-card.silver:hover { box-shadow: 0 10px 40px rgba(255,255,255,0.1); border-color: #fff; background: rgba(255,255,255,0.08); }
+.nav-card.silver h3 { color: #fff; }
+.nav-card.silver span { color: #aaa; }
+
+.nav-card h3 { font-family: var(--ff-head); font-size: 1.8rem; margin: 5px 0 0; line-height: 1; }
+.nav-card span { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.2em; font-weight: 700; display:block; }
 
 /* === HERO === */
 .hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
@@ -330,21 +355,6 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .gallery-grid img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; filter: grayscale(30%); transition: 0.5s; cursor: pointer; background: #111; }
 .gallery-grid img:hover { filter: grayscale(0); transform: scale(1.05); z-index: 2; }
 
-/* === SCHOOL SECTION === */
-.school-section {
-  position: relative;
-  background: url('https://images.unsplash.com/photo-1551024601-5629f97797b4?q=80&w=2070&auto=format&fit=crop') center/cover no-repeat;
-  border-top: 1px solid #333;
-}
-.school-overlay {
-  background: linear-gradient(90deg, #000 0%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.4) 100%);
-  padding: 80px 0;
-}
-.school-content { max-width: 600px; }
-.school-label { color: var(--gold-primary); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.9rem; margin-bottom: 10px; display: block; }
-.school-title { font-family: var(--ff-head); font-size: 3rem; margin-bottom: 20px; line-height: 1.1; }
-.school-desc { color: #ccc; margin-bottom: 30px; font-size: 1.1rem; }
-
 /* === MODALS & WIDGETS === */
 .modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
 .modal.open { display: flex; }
@@ -411,14 +421,17 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <div class="menu-group-title">Event & Show</div>
-  <a href="#hero" class="menu-link" onclick="toggleMenu()">Главная</a>
-  <a href="#formats" class="menu-link" onclick="toggleMenu()">Концертные Шоу</a>
-  <a href="#calc" class="menu-link" onclick="toggleMenu()">Стоимость</a>
-  <a href="#gallery" class="menu-link" onclick="toggleMenu()">Галерея</a>
-  
-  <div class="menu-group-title" style="margin-top: 40px; color: var(--gold-primary); border-color: var(--gold-primary);">Education</div>
-  <a href="#school" class="menu-link highlight" onclick="toggleMenu()">Школа Фокусов</a>
+  <a href="#hero" class="nav-card gold" onclick="toggleMenu()">
+    <span>Corporate & Private</span>
+    <h3>EVENT SHOWS</h3>
+  </a>
+
+  <div style="height: 20px;"></div>
+
+  <a href="https://t.me/Dmitrokko" target="_blank" class="nav-card silver" onclick="toggleMenu()">
+    <span>Education</span>
+    <h3>MAGIC SCHOOL</h3>
+  </a>
 </div>
 
 <section id="hero" class="hero">
@@ -584,22 +597,6 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
   <div class="container gs-reveal">
     <h2 class="text-center" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:40px;">Все вопросы</h2>
     <div class="faq-grid" id="faqContainer"></div>
-  </div>
-</section>
-
-<section id="school" class="school-section">
-  <div class="school-overlay">
-    <div class="container">
-      <div class="school-content gs-reveal">
-        <span class="school-label">Education</span>
-        <h2 class="school-title">KOSTYUK <br><span class="text-gold">MAGIC SCHOOL</span></h2>
-        <p class="school-desc">Раскрой секреты иллюзии. Профессиональное обучение для тех, кто хочет удивлять, и для тех, кто уже в игре.</p>
-        <a href="https://t.me/Dmitrokko" class="btn btn-primary" target="_blank">
-          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Начать обучение
-        </a>
-      </div>
-    </div>
   </div>
 </section>
 
