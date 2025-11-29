@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Kostyuk Project | Premium Magic</title>
+<title>Kostyuk Project | Show & School</title>
 
-<meta name="description" content="Премиальное шоу иллюзиониста Дмитрия Костюка.">
+<meta name="description" content="Премиальное шоу иллюзиониста Дмитрия Костюка и Школа магии.">
 <meta property="og:title" content="Kostyuk Project">
 <meta property="og:image" content="images/hero-portrait.png">
 <meta name="theme-color" content="#050505">
@@ -149,7 +149,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .burger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
 .burger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
 
-/* === SPLIT MENU (NEW DESIGN) === */
+/* === SPLIT MENU (PREMIUM RUSSIAN DESIGN) === */
 .mobile-menu {
   position: fixed; inset: 0; background: #000; z-index: 99;
   display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem;
@@ -172,20 +172,20 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 }
 .nav-card:hover { transform: translateY(-5px); }
 
-/* Event Card Style */
+/* Event Card Style (Gold) */
 .nav-card.gold { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(0,0,0,0.8)); border-color: var(--gold-primary); }
 .nav-card.gold:hover { box-shadow: 0 10px 40px rgba(212,175,55,0.2); }
 .nav-card.gold h3 { color: #fff; }
 .nav-card.gold span { color: var(--gold-primary); }
 
-/* School Card Style */
+/* School Card Style (Silver) */
 .nav-card.silver { background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.8)); border-color: #fff; }
 .nav-card.silver:hover { box-shadow: 0 10px 40px rgba(255,255,255,0.1); border-color: #fff; background: rgba(255,255,255,0.08); }
 .nav-card.silver h3 { color: #fff; }
 .nav-card.silver span { color: #aaa; }
 
-.nav-card h3 { font-family: var(--ff-head); font-size: 1.8rem; margin: 5px 0 0; line-height: 1; }
-.nav-card span { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.2em; font-weight: 700; display:block; }
+.nav-card h3 { font-family: var(--ff-head); font-size: 1.6rem; margin: 10px 0 0; line-height: 1.2; letter-spacing: 0.05em; text-transform: uppercase; }
+.nav-card span { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; font-weight: 700; display:block; opacity: 0.8; }
 
 /* === HERO === */
 .hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
@@ -422,15 +422,15 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 
 <div class="mobile-menu" id="mobileMenu">
   <a href="#hero" class="nav-card gold" onclick="toggleMenu()">
-    <span>Corporate & Private</span>
-    <h3>EVENT SHOWS</h3>
+    <span>Корпоративы и Праздники</span>
+    <h3>КОНЦЕРТНЫЕ ШОУ</h3>
   </a>
 
   <div style="height: 20px;"></div>
 
   <a href="https://t.me/Dmitrokko" target="_blank" class="nav-card silver" onclick="toggleMenu()">
-    <span>Education</span>
-    <h3>MAGIC SCHOOL</h3>
+    <span>Обучение с нуля</span>
+    <h3>ШКОЛА ФОКУСОВ</h3>
   </a>
 </div>
 
@@ -687,6 +687,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Init Logic
   initThreeJS();
+  initHeroParticles();
   updateServices();
   
   // CURTAIN ANIMATION SEQUENCE
