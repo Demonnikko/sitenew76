@@ -161,6 +161,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .nav-card {
   width: 100%; max-width: 400px; padding: 40px 30px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
   text-decoration: none; text-align: center; transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1); position: relative; overflow: hidden; backdrop-filter: blur(10px);
+  background: none; cursor: pointer;
 }
 .nav-card:hover { transform: translateY(-5px); }
 .nav-card.gold { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(0,0,0,0.8)); border-color: var(--gold-primary); }
@@ -340,12 +341,7 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .gallery-grid img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; filter: grayscale(30%); transition: 0.5s; cursor: pointer; background: #111; }
 .gallery-grid img:hover { filter: grayscale(0); transform: scale(1.05); z-index: 2; }
 
-/* === MODALS & WIDGETS === */
-.modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-.modal.open { display: flex; }
-.close-btn { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer; z-index: 201; }
-
-/* SCHOOL MODAL (NEW) */
+/* === SCHOOL MODAL === */
 .school-modal-content {
   background: linear-gradient(135deg, #0D1424, #000);
   padding: 40px; border-radius: 20px; border: 1px solid #333;
@@ -357,6 +353,25 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .school-modal-content p { color: #ccc; text-align: center; margin-bottom: 20px; font-size: 0.95rem; }
 .school-features { display: grid; gap: 15px; margin-bottom: 25px; }
 .school-feat { display: flex; align-items: center; gap: 10px; color: #e9ecf4; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+
+/* === SECRET INVITE WIDGET === */
+.secret-invite {
+  position: fixed; bottom: 30px; left: 20px; z-index: 990;
+  background: rgba(10, 15, 30, 0.95);
+  border: 1px solid var(--gold-primary); border-radius: 12px; padding: 15px 20px; max-width: 320px;
+  display: flex; gap: 15px; align-items: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  transform: translateY(150%); transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.secret-invite.visible { transform: translateY(0); }
+.secret-invite:hover { background: #1a1a1a; }
+.invite-icon { width: 40px; height: 40px; background: var(--gold-primary); color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+.invite-text h4 { font-family: var(--ff-head); font-size: 0.9rem; color: #fff; margin-bottom: 4px; }
+.invite-text p { font-size: 0.75rem; color: #aaa; line-height: 1.3; margin: 0; }
+.invite-close { position: absolute; top: 5px; right: 8px; font-size: 1rem; color: #666; background: none; border: none; cursor: pointer; padding: 0; }
+.invite-close:hover { color: #fff; }
+@media (max-width: 768px) { .secret-invite { bottom: 90px; left: 10px; right: 10px; max-width: none; } }
 
 /* Video Widget */
 .video-widget {
@@ -664,6 +679,15 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
   </div>
 </div>
 
+<div class="secret-invite" id="secretInvite" onclick="openSchoolModal()">
+  <button class="invite-close" onclick="event.stopPropagation(); closeInvite()">×</button>
+  <div class="invite-icon">🎓</div>
+  <div class="invite-text">
+    <h4>Хочешь узнать секрет?</h4>
+    <p>Не просто смотри. Научись делать это сам. Набор в школу магии открыт.</p>
+  </div>
+</div>
+
 <div class="modal" id="modalVideo">
   <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000">
     <button class="close-btn" onclick="closeVideo()">×</button>
@@ -849,6 +873,22 @@ async function sendToTg(text, btn, oldText) {
     alert('Ошибка отправки.'); btn.innerText = oldText; btn.disabled = false;
   }
 }
+
+/* === SECRET INVITE LOGIC === */
+function initInvite() {
+  const invite = document.getElementById('secretInvite');
+  setTimeout(() => {
+    if(!localStorage.getItem('inviteClosed')) {
+       invite.classList.add('visible');
+       playHoverSound(); 
+    }
+  }, 12000);
+}
+function closeInvite() {
+  document.getElementById('secretInvite').classList.remove('visible');
+  localStorage.setItem('inviteClosed', 'true'); 
+}
+initInvite();
 
 /* === SCHOOL MODAL LOGIC === */
 function openSchoolModal() {
