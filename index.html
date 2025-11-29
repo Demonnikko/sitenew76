@@ -43,7 +43,7 @@ body {
   opacity: 0; visibility: hidden;
 }
 
-/* 3D CANVAS */
+/* 3D BACKGROUND CANVAS */
 #webgl-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
 /* MAGIC CURSOR */
@@ -57,17 +57,63 @@ body {
 .magic-cursor.hovered { width: 60px; height: 60px; background: rgba(212, 175, 55, 0.8); border-color: transparent; mix-blend-mode: normal; }
 @media (max-width: 900px) { .magic-cursor { display: none; } }
 
-/* Preloader */
-.preloader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; align-items: center; justify-content: center; }
-.preloader-text { font-family: var(--ff-head); font-size: 1.5rem; color: var(--gold-primary); letter-spacing: 0.2em; opacity: 0; }
+/* === ULTIMATE CURTAINS (PRELOADER) === */
+.curtain-wrapper {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; pointer-events: none;
+  background: #000;
+}
+.curtain-spotlight {
+  position: absolute; inset: 0; z-index: 5;
+  background: radial-gradient(circle at 50% 40%, transparent 10%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%);
+  pointer-events: none;
+}
+.curtain-panel {
+  width: 50%; height: 100%;
+  position: relative; z-index: 2;
+  background-color: #4a0404; /* Royal Red */
+  /* Volumetric Folds */
+  background-image: repeating-linear-gradient(90deg, 
+      rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(255,50,50,0.1) 25%, rgba(80,0,0,0.5) 35%, rgba(0,0,0,0.8) 50%
+  );
+  /* Texture Noise Filter */
+  filter: url(#velvet-noise) contrast(1.1) brightness(0.9);
+  box-shadow: inset 0 0 150px rgba(0,0,0,1);
+  transform-origin: top; will-change: transform;
+}
+.curtain-panel::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 15px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold-primary), var(--gold-dark));
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.5);
+}
+.curtain-panel.left { border-right: 1px solid rgba(0,0,0,0.8); }
+.curtain-panel.right { border-left: 1px solid rgba(0,0,0,0.8); }
+
+.curtain-content {
+  position: absolute; top: 45%; left: 50%;
+  transform: translate(-50%, -50%); z-index: 10;
+  text-align: center; width: 100%; perspective: 1000px;
+}
+.curtain-text {
+  font-family: var(--ff-head); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; 
+  color: transparent;
+  background: linear-gradient(to bottom, #FFF5C3 0%, #D4AF37 40%, #8A6E2F 100%);
+  -webkit-background-clip: text; background-clip: text;
+  filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5)) drop-shadow(0 2px 0 #000);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0; transform: scale(0.9);
+}
+.curtain-subtext {
+  font-family: var(--ff-body); font-size: 0.9rem; 
+  color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.3em;
+  margin-top: 10px; opacity: 0;
+}
 
 /* === UI UTILS === */
 .container { width: var(--container); margin: 0 auto; position: relative; z-index: 2; }
 .section-py { padding-block: clamp(60px, 8vw, 120px); }
 .text-gold { background: linear-gradient(to right, #D4AF37, #FFF5C3, #D4AF37); -webkit-background-clip: text; color: transparent; background-clip: text; font-weight: 700; }
 .text-center { text-align: center; }
-
-/* SVG Icons */
 .icon-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .icon-large { width: 48px; height: 48px; stroke-width: 1.5; }
 
@@ -97,8 +143,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .header { position: fixed; top: 0; inset-inline: 0; z-index: 100; padding: 20px 0; transition: 0.4s; }
 .header.scrolled { background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .nav-flex { display: flex; justify-content: space-between; align-items: center; }
-.logo { font-family: var(--ff-head); font-size: 1.5rem; font-weight: 900; color: #fff; }
-.logo span { color: var(--gold-primary); }
+.logo { width: 50px; } /* Spacer for layout */
 .burger { width: 40px; height: 40px; background: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; border:none; cursor:pointer; }
 .burger span { width: 28px; height: 2px; background: #fff; align-self: flex-end; transition: 0.3s; }
 .burger.active span:nth-child(2) { opacity: 0; }
@@ -116,18 +161,11 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 /* === HERO === */
 .hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
 .hero-img {
-  position: absolute; right: 0; bottom: 0; height: 95%; width: 55%;
-  background: url('images/portrait.jpg') no-repeat bottom center/contain;
-  mask-image: linear-gradient(to right, transparent 5%, black 40%);
-  -webkit-mask-image: linear-gradient(to right, transparent 5%, black 40%);
-  opacity: 0.9; pointer-events: none;
+  position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
+  background: transparent; pointer-events: none; z-index: 1;
 }
-@media (max-width: 768px) {
-  .hero-img { width: 100%; height: 60%; bottom: 0; right: 0; opacity: 0.4; mask-image: linear-gradient(to top, black, transparent); -webkit-mask-image: linear-gradient(to top, black, transparent); }
-  .hero-content { padding-top: 0; text-align: center; }
-  .hero-btns { justify-content: center; }
-  .hero-stats { justify-content: center; flex-wrap: wrap; gap: 20px; }
-}
+#hero-particles-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+@media (max-width: 768px) { .hero-img { width: 100%; height: 100%; } }
 
 .hero-content { max-width: 700px; position: relative; z-index: 2; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
@@ -138,7 +176,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
 /* === PARTNERS MARQUEE === */
-.partners-section { padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); }
+.partners-section { padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; }
 .partners-track { display: flex; gap: 60px; animation: scrollLogos 35s linear infinite; width: max-content; }
 .partner-logo { height: 35px; opacity: 0.4; filter: grayscale(100%); transition: 0.3s; }
 .partner-logo:hover { opacity: 1; filter: grayscale(0); }
@@ -167,7 +205,6 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .wizard-progress { height: 4px; background: #222; width: 100%; }
 .progress-bar { height: 100%; background: var(--gradient-gold); width: 33%; transition: 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
 .wizard-step { padding: 30px; display: none; flex: 1; flex-direction: column; animation: slideIn 0.5s ease; overflow-y: auto; }
-/* Custom Scrollbar for Step 2 */
 .wizard-step::-webkit-scrollbar { width: 6px; }
 .wizard-step::-webkit-scrollbar-track { background: #111; }
 .wizard-step::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
@@ -179,7 +216,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .receipt-row { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px dashed #333; padding-bottom: 5px; color: #bbb; font-size: 0.9rem; }
 .receipt-total { font-size: 2rem; color: var(--gold-primary); font-family: var(--ff-head); text-align: right; display: block; margin-top: 15px; }
 
-/* Multi-Select Service Buttons (FIXED LAYOUT) */
+/* Multi-Select Service Buttons */
 #svcOptions { display: flex; flex-direction: column; gap: 25px; }
 .svc-category-group { display: flex; flex-direction: column; gap: 10px; }
 .svc-group-title { color: var(--gold-primary); font-family: var(--ff-head); text-transform: uppercase; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; letter-spacing: 0.05em; width:100%; }
@@ -205,17 +242,13 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
   position: relative; overflow: hidden;
 }
 @keyframes popIn { from{transform:scale(0.9);opacity:0} to{transform:scale(1);opacity:1} }
-
-/* Gift Badge - Making it obvious */
 .bonus-item .gift-badge { 
-  margin-left: auto; /* Push to right */
-  background: #28a745; color: #fff; 
+  margin-left: auto; background: #28a745; color: #fff; 
   font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: 800;
   text-transform: uppercase; letter-spacing: 0.05em;
   animation: pulseGreen 2s infinite; text-align: center;
 }
 @keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); } 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); } }
-
 .bonus-tier-1 { border-color: #4CAF50; background: linear-gradient(to right, rgba(76, 175, 80, 0.15), transparent); }
 .bonus-tier-1 .icon-svg { stroke: #4CAF50; }
 .bonus-tier-2 { border-color: var(--gold-primary); background: linear-gradient(to right, rgba(212, 175, 55, 0.15), transparent); }
@@ -236,13 +269,43 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .back { background: linear-gradient(135deg, #111, #333); border: 2px solid var(--gold-primary); transform: rotateY(0deg); z-index: 2; }
 .front { transform: rotateY(180deg); color: #000; }
 
-/* === REVIEWS & FAQ === */
-.reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.review-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 16px; backdrop-filter: blur(5px); }
-.stars { display:flex; gap:2px; margin-bottom: 10px; }
-.stars svg { width:16px; height:16px; fill:var(--gold-primary); stroke:none; }
-.review-text { font-style: italic; color: #ccc; margin-bottom: 15px; line-height: 1.5; font-size: 0.95rem; }
-.review-author { font-weight: 700; color: #fff; font-family: var(--ff-head); font-size: 0.9rem; }
+/* === REVIEWS (TELEGRAM STYLE) & FAQ === */
+.reviews-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+.tg-review-item { display: flex; flex-direction: column; align-items: center; width: 200px; }
+.tg-circle {
+  width: 180px; height: 180px; border-radius: 50%; overflow: hidden;
+  border: 3px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  position: relative; cursor: pointer; transition: transform 0.3s ease, border-color 0.3s;
+  background: #000; margin-bottom: 15px;
+}
+.tg-circle:hover { transform: scale(1.05); border-color: #fff; }
+.tg-circle video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.review-author { font-weight: 700; color: #fff; font-family: var(--ff-head); font-size: 1rem; text-align: center; }
+.review-role { color: var(--gold-primary); font-size: 0.85rem; text-align: center; }
+
+/* === STORY VIEWER (TELEGRAM STYLE MODAL) === */
+.story-viewer {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.story-viewer.active { opacity: 1; pointer-events: all; }
+.story-content {
+  position: relative; max-width: 90vw; max-height: 90vh; aspect-ratio: 9/16;
+  border-radius: 20px; overflow: hidden; box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+  border: 1px solid #333; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.story-viewer.active .story-content { transform: scale(1); }
+.story-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.story-close {
+  position: absolute; top: 20px; right: 20px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  cursor: pointer; z-index: 10; transition: 0.2s;
+}
+.story-close:hover { background: #fff; color: #000; }
 
 .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)); gap: 15px; }
 @media (min-width: 768px) { .faq-grid { grid-template-columns: 1fr 1fr; } }
@@ -294,15 +357,32 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 
 <div class="magic-cursor"></div>
 
-<canvas id="webgl-canvas"></canvas>
+<svg style="display: none;">
+  <filter id="velvet-noise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+    <feColorMatrix type="saturate" values="0" />
+    <feComponentTransfer>
+      <feFuncA type="linear" slope="0.4" />
+    </feComponentTransfer>
+    <feBlend mode="multiply" in2="SourceGraphic" />
+  </filter>
+</svg>
 
-<div class="preloader">
-  <div class="preloader-text">KOSTYUK.MAGIC</div>
+<div class="curtain-wrapper">
+  <div class="curtain-spotlight"></div>
+  <div class="curtain-panel left"></div>
+  <div class="curtain-panel right"></div>
+  <div class="curtain-content">
+    <div class="curtain-text">KOSTYUK PROJECT</div>
+    <div class="curtain-subtext">Premium Magic Show</div>
+  </div>
 </div>
+
+<canvas id="webgl-canvas"></canvas>
 
 <header class="header">
   <div class="container nav-flex">
-    <div class="logo">KOSTYUK<span>.MAGIC</span></div>
+    <div class="logo"></div>
     <button class="burger" onclick="toggleMenu()">
       <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
@@ -317,7 +397,10 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </div>
 
 <section id="hero" class="hero">
-  <div class="hero-img"></div>
+  <div class="hero-img">
+    <div id="hero-particles-container"></div>
+  </div>
+  
   <div class="container">
     <div class="hero-content">
       <h1 class="hero-title">Магия <br><span class="text-gold">Высокого Уровня</span></h1>
@@ -454,29 +537,42 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 
 <section class="section-py">
   <div class="container gs-reveal">
-    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2rem; margin-bottom:40px;">Отзывы</h2>
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2rem; margin-bottom:40px;">Видео-отзывы</h2>
     <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      <div class="tg-review-item">
+        <div class="tg-circle" onclick="openReview(this)">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" autoplay muted loop playsinline></video>
         </div>
-        <p class="review-text">"Дмитрий, это был разрыв! Гости до сих пор обсуждают, как вы угадали пин-код от карты директора. Спасибо за эмоции!"</p>
-        <div class="review-author">Елена, HR-директор</div>
+        <div class="review-author">Александр</div>
+        <div class="review-role">CEO, TechCorp</div>
       </div>
-      <div class="review-card">
-        <div class="stars">
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      <div class="tg-review-item">
+        <div class="tg-circle" onclick="openReview(this)">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" autoplay muted loop playsinline></video>
         </div>
-        <p class="review-text">"Работаем с Дмитрием уже третий год на новогодних корпоративах. Всегда новая программа и вау-эффект."</p>
+        <div class="review-author">Мария</div>
+        <div class="review-role">Event-менеджер</div>
+      </div>
+       <div class="tg-review-item">
+        <div class="tg-circle" onclick="openReview(this)">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-people-talking-in-a-meeting-room-3512-large.mp4" autoplay muted loop playsinline></video>
+        </div>
         <div class="review-author">Агентство "Праздник"</div>
+        <div class="review-role">Партнеры</div>
+      </div>
+      <div class="tg-review-item">
+        <div class="tg-circle" onclick="openReview(this)">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="review-author">Елена</div>
+        <div class="review-role">HR, Газпром</div>
+      </div>
+      <div class="tg-review-item">
+        <div class="tg-circle" onclick="openReview(this)">
+          <video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="review-author">Дмитрий</div>
+        <div class="review-role">Частный юбилей</div>
       </div>
     </div>
   </div>
@@ -523,6 +619,13 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
     <svg class="icon-svg" viewBox="0 0 24 24" style="fill:currentColor;stroke:none;"><path d="M21.93 3.37a1.93 1.93 0 0 0-2-.28l-17 7.14a2 2 0 0 0 .23 3.71l4.67 1.35 1.75 5.42a2 2 0 0 0 3.28.86l2.55-2.11 4.9 3.63a2 2 0 0 0 3.24-1.73l3-16.2a1.93 1.93 0 0 0-1.62-2.19z"></path></svg>
   </a>
   <a href="#calc" class="sticky-btn">Узнать стоимость</a>
+</div>
+
+<div class="story-viewer" id="storyViewer" onclick="closeReview()">
+  <div class="story-content" onclick="event.stopPropagation()">
+    <button class="story-close" onclick="closeReview()">×</button>
+    <video id="storyVideo" class="story-video" src="" playsinline loop></video>
+  </div>
 </div>
 
 <div class="modal" id="modalVideo">
@@ -578,15 +681,40 @@ window.addEventListener("DOMContentLoaded", () => {
   initThreeJS();
   updateServices();
   
-  // Animations
+  // CURTAIN ANIMATION SEQUENCE
   document.body.style.opacity = 1; document.body.style.visibility = "visible";
+  
   const tl = gsap.timeline();
-  tl.to(".preloader-text", { opacity: 1, duration: 0.8 })
-    .to(".preloader", { yPercent: -100, duration: 1, ease: "power4.inOut" }, "+=0.5")
-    .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=0.5")
-    .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
+  
+  // 1. Text Appears (Scale + Opacity)
+  tl.to(".curtain-text", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" })
+    .to(".curtain-subtext", { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }, "-=1")
+    
+  // 2. Open Curtains (Heavy Feel)
+    .to(".curtain-panel.left", { xPercent: -100, duration: 3, ease: "power2.inOut" }, "+=0.5")
+    .to(".curtain-panel.right", { xPercent: 100, duration: 3, ease: "power2.inOut" }, "<")
+    .to(".curtain-content", { opacity: 0, scale: 1.2, duration: 1.5, ease: "power2.in" }, "<")
+    
+  // 3. MAGIC PARTICLES START ASSEMBLE
+    .to({}, { 
+        duration: 3, 
+        onUpdate: function() {
+            if(heroParticlesMaterial) {
+                gsap.to(heroParticlesMaterial.uniforms.uProgress, {
+                    value: 1, 
+                    duration: 4, 
+                    ease: "power2.out" 
+                });
+            }
+        } 
+    }, "-=2.5")
+
+  // 4. Hero Content Animations
+    .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.5")
+    .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.8")
     .from(".hero-btns", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
-    .from(".hero-stats", { opacity: 1, duration: 1 }, "-=0.5");
+    .from(".hero-stats", { opacity: 1, duration: 1 }, "-=0.5")
+    .set(".curtain-wrapper", { display: "none" });
 
   gsap.utils.toArray(".card").forEach((card, i) => {
     gsap.to(card, { scrollTrigger: { trigger: card, start: "top 85%" }, y: 0, opacity: 1, duration: 0.8, delay: i*0.1, ease: "power3.out" });
@@ -595,6 +723,30 @@ window.addEventListener("DOMContentLoaded", () => {
     gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 80%" }, y: 40, opacity: 0, duration: 1, ease: "power3.out" });
   });
 });
+
+/* === STORY VIEWER LOGIC === */
+function openReview(el) {
+  const vidSrc = el.querySelector('video').src;
+  const viewer = document.getElementById('storyViewer');
+  const viewVid = document.getElementById('storyVideo');
+  
+  viewVid.src = vidSrc;
+  viewer.classList.add('active');
+  viewVid.currentTime = 0;
+  viewVid.play();
+  viewVid.muted = false; // UNMUTE when opened
+}
+
+function closeReview() {
+  const viewer = document.getElementById('storyViewer');
+  const viewVid = document.getElementById('storyVideo');
+  
+  viewer.classList.remove('active');
+  setTimeout(() => {
+    viewVid.pause();
+    viewVid.src = "";
+  }, 300);
+}
 
 /* === AUDIO UX === */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -790,81 +942,124 @@ function calcResult(){
   nextStep(3);
 }
 
-/* === GAME === */
-const deck=document.getElementById('gameDeck'), msg=document.getElementById('gameMsg');
-const suits=['♠','♥','♣','♦'], ranks=['J','Q','K','A'];
+/* === THREE.JS HERO PORTRAIT PARTICLES === */
+let heroParticlesMaterial;
 
-function initGame(){
-  const lastPlayed = localStorage.getItem('game_timestamp');
-  const hasWon = localStorage.getItem('game_win') === 'true';
-  const cooldown = 24 * 60 * 60 * 1000; 
+function initHeroParticles() {
+  const container = document.getElementById('hero-particles-container');
+  if (!container) return;
 
-  if (lastPlayed && (Date.now() - lastPlayed < cooldown)) {
-    deck.innerHTML = `<div style="padding:20px;border:1px solid #333;border-radius:12px;background:#111"><h3>${hasWon ? 'Скидка 20% Ваша!' : 'Следующая попытка завтра'}</h3></div>`;
-    if (hasWon) msg.innerHTML = '<span style="color:var(--gold-primary)">Код скидки активирован</span>';
-    return;
-  }
+  const scene = new THREE.Scene();
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 100;
 
-  deck.innerHTML=''; 
-  const winIdx=Math.floor(Math.random()*3);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  // LOAD IMAGE FOR PARTICLES
+  const img = new Image();
+  img.src = 'images/hero-portrait.png'; 
   
-  for(let i=0;i<3;i++){
-    const isWin=(i===winIdx), suit=isWin?'♠':suits[Math.floor(Math.random()*3)+1], rank=isWin?'A':ranks[Math.floor(Math.random()*3)];
-    const c=document.createElement('div'); c.className='card-play';
-    c.innerHTML=`<div class="face back"></div><div class="face front" style="color:${['♠','♣'].includes(suit)?'#000':'#c00'}">${rank}${suit}</div>`;
+  img.onload = () => {
+    const imageCanvas = document.createElement('canvas');
+    const ctx = imageCanvas.getContext('2d');
+    const particleDensity = window.innerWidth < 768 ? 6 : 4;
+    const iw = img.width;
+    const ih = img.height;
     
-    c.onclick=()=>{
-      if(localStorage.getItem('game_timestamp') && (Date.now() - localStorage.getItem('game_timestamp') < cooldown)) return;
-      localStorage.setItem('game_timestamp', Date.now());
-      document.querySelectorAll('.card-play').forEach(el=>el.classList.add('flipped'));
-      if(isWin){
-        msg.innerHTML='<span style="color:var(--gold-primary)">ПОБЕДА! Скидка 20%</span>';
-        localStorage.setItem('game_win','true');
-      } else {
-        msg.textContent='Увы, скидки нет.';
-        localStorage.setItem('game_win','false');
+    imageCanvas.width = iw;
+    imageCanvas.height = ih;
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(0, 0, iw, ih).data;
+
+    const geometry = new THREE.BufferGeometry();
+    const positions = [];
+    const colors = [];
+    const randoms = [];
+
+    const ratio = window.innerWidth < 768 ? 0.15 : 0.25; 
+    
+    for (let y = 0; y < ih; y += particleDensity) {
+      for (let x = 0; x < iw; x += particleDensity) {
+        const i = (y * iw + x) * 4;
+        const r = data[i] / 255;
+        const g = data[i + 1] / 255;
+        const b = data[i + 2] / 255;
+        const a = data[i + 3];
+
+        if (a > 20 && (r+g+b) > 0.1) {
+          const px = (x - iw / 2) * ratio; 
+          const py = -(y - ih / 2) * ratio - 10;
+          const pz = 0;
+
+          positions.push(px, py, pz);
+          colors.push(r, g, b);
+          randoms.push((Math.random()-0.5)*400, (Math.random()-0.5)*400, (Math.random()-0.5)*400);
+        }
       }
-    };
-    deck.appendChild(c);
-  }
-}
-initGame();
+    }
 
-/* === DYNAMIC COUNTERS === */
-(() => {
-  const exp = new Date().getFullYear() - 2018;
-  document.getElementById('expYears').innerText = exp;
-  document.getElementById('showsCount').innerText = 1800 + (exp * 50);
-})();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('aRandom', new THREE.Float32BufferAttribute(randoms, 3));
 
-/* === MAGIC CURSOR === */
-const cursor = document.querySelector('.magic-cursor');
-if(window.matchMedia("(pointer: fine)").matches) {
-  document.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+    heroParticlesMaterial = new THREE.ShaderMaterial({
+      vertexShader: `
+        uniform float uTime;
+        uniform float uProgress;
+        attribute vec3 aRandom;
+        varying vec3 vColor;
+        void main() {
+          vColor = color;
+          vec3 pos = mix(aRandom, position, uProgress);
+          pos.x += sin(uTime * 2.0 + position.y) * 0.5 * uProgress;
+          pos.z += cos(uTime * 1.5 + position.x) * 0.5 * uProgress;
+          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+          gl_PointSize = (3.0 * uProgress + 1.0) * (50.0 / -mvPosition.z);
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        void main() {
+          float dist = length(gl_PointCoord - vec2(0.5));
+          if (dist > 0.5) discard;
+          gl_FragColor = vec4(vColor, 1.0);
+        }
+      `,
+      uniforms: { uTime: { value: 0 }, uProgress: { value: 0 } },
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    });
+
+    const particles = new THREE.Points(geometry, heroParticlesMaterial);
+    if(window.innerWidth > 768) particles.position.x = 25; else particles.position.y = 10;
+    scene.add(particles);
+
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const time = clock.getElapsedTime();
+      heroParticlesMaterial.uniforms.uTime.value = time;
+      renderer.render(scene, camera);
+    }
+    animate();
+  };
+  
+  window.addEventListener('resize', () => {
+    const w = container.offsetWidth;
+    const h = container.offsetHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
   });
 }
+initHeroParticles();
 
-window.addEventListener('scroll', () => {
-  const heroH = document.getElementById('hero').offsetHeight;
-  const bar = document.getElementById('stickyBar');
-  if (window.scrollY > heroH) bar.classList.add('visible'); else bar.classList.remove('visible');
-  document.querySelector('.header').classList.toggle('scrolled', window.scrollY > 50);
-});
-
-/* === VIDEO WIDGET === */
-const vidW = document.getElementById('vidWidget');
-const vid = document.getElementById('myVid');
-let vidExp = false;
-vidW.onclick = () => {
-  vidExp = !vidExp; vidW.classList.toggle('expanded', vidExp);
-  vid.muted = !vidExp; if(vidExp) vid.play();
-}
-
-function openVideo(){ document.getElementById('modalVideo').classList.add('open'); document.getElementById('vidContainer').innerHTML = '<iframe src="https://rutube.ru/play/embed/a692a6ad3b922abc4cfad5be5898431b?autoplay=1" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>'; }
-function closeVideo(){ document.getElementById('modalVideo').classList.remove('open'); document.getElementById('vidContainer').innerHTML = ''; }
-
-/* === THREE.JS === */
+/* === BACKGROUND PARTICLES (Original) === */
 const initThreeJS = () => {
   const canvas = document.querySelector('#webgl-canvas');
   const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x000000, 0.001);
