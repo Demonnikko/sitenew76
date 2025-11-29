@@ -149,7 +149,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .burger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
 .burger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
 
-/* === SPLIT MENU (PREMIUM RUSSIAN DESIGN) === */
+/* === SPLIT MENU === */
 .mobile-menu {
   position: fixed; inset: 0; background: #000; z-index: 99;
   display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem;
@@ -158,32 +158,17 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 }
 .mobile-menu.open { transform: translateY(0); }
 
-/* Menu Cards */
 .nav-card {
-  width: 100%; max-width: 400px;
-  padding: 40px 30px;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 20px;
-  text-decoration: none;
-  text-align: center;
-  transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  position: relative; overflow: hidden;
-  backdrop-filter: blur(10px);
+  width: 100%; max-width: 400px; padding: 40px 30px; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+  text-decoration: none; text-align: center; transition: 0.4s cubic-bezier(0.25, 1, 0.5, 1); position: relative; overflow: hidden; backdrop-filter: blur(10px);
 }
 .nav-card:hover { transform: translateY(-5px); }
-
-/* Event Card Style (Gold) */
 .nav-card.gold { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(0,0,0,0.8)); border-color: var(--gold-primary); }
 .nav-card.gold:hover { box-shadow: 0 10px 40px rgba(212,175,55,0.2); }
-.nav-card.gold h3 { color: #fff; }
-.nav-card.gold span { color: var(--gold-primary); }
-
-/* School Card Style (Silver) */
+.nav-card.gold h3 { color: #fff; } .nav-card.gold span { color: var(--gold-primary); }
 .nav-card.silver { background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.8)); border-color: #fff; }
 .nav-card.silver:hover { box-shadow: 0 10px 40px rgba(255,255,255,0.1); border-color: #fff; background: rgba(255,255,255,0.08); }
-.nav-card.silver h3 { color: #fff; }
-.nav-card.silver span { color: #aaa; }
-
+.nav-card.silver h3 { color: #fff; } .nav-card.silver span { color: #aaa; }
 .nav-card h3 { font-family: var(--ff-head); font-size: 1.6rem; margin: 10px 0 0; line-height: 1.2; letter-spacing: 0.05em; text-transform: uppercase; }
 .nav-card span { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; font-weight: 700; display:block; opacity: 0.8; }
 
@@ -360,6 +345,19 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .modal.open { display: flex; }
 .close-btn { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer; z-index: 201; }
 
+/* SCHOOL MODAL (NEW) */
+.school-modal-content {
+  background: linear-gradient(135deg, #0D1424, #000);
+  padding: 40px; border-radius: 20px; border: 1px solid #333;
+  max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+.school-modal-content h2 { font-family: var(--ff-head); font-size: 2rem; margin-bottom: 10px; color: #fff; text-align: center; }
+.school-modal-content p { color: #ccc; text-align: center; margin-bottom: 20px; font-size: 0.95rem; }
+.school-features { display: grid; gap: 15px; margin-bottom: 25px; }
+.school-feat { display: flex; align-items: center; gap: 10px; color: #e9ecf4; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+
 /* Video Widget */
 .video-widget {
   position: fixed; bottom: 80px; right: 20px; width: 100px; height: 160px;
@@ -422,16 +420,16 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 
 <div class="mobile-menu" id="mobileMenu">
   <a href="#hero" class="nav-card gold" onclick="toggleMenu()">
-    <span></span>
+    <span>Корпоративы и Праздники</span>
     <h3>КОНЦЕРТНЫЕ ШОУ</h3>
   </a>
 
   <div style="height: 20px;"></div>
 
-  <a href="https://t.me/Dmitrokko" target="_blank" class="nav-card silver" onclick="toggleMenu()">
-    <span></span>
+  <button class="nav-card silver" onclick="openSchoolModal()">
+    <span>Обучение с нуля</span>
     <h3>ШКОЛА ФОКУСОВ</h3>
-  </a>
+  </button>
 </div>
 
 <section id="hero" class="hero">
@@ -636,6 +634,36 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
   </div>
 </div>
 
+<div id="schoolModal" class="modal">
+  <div class="school-modal-content">
+    <button class="close-btn" onclick="closeSchoolModal()">×</button>
+    <h2>Школа Фокусов</h2>
+    <p>Станьте душой компании, научитесь управлять вниманием и дарить эмоции.</p>
+    
+    <div class="school-features">
+      <div class="school-feat">
+         <svg class="icon-svg" style="color:var(--gold-primary); flex-shrink:0" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+         <span>Харизма и уверенность в себе</span>
+      </div>
+      <div class="school-feat">
+         <svg class="icon-svg" style="color:var(--gold-primary); flex-shrink:0" viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M12 4v16M5 9l7-5 7 5"/></svg>
+         <span>Сценическая речь и актёрское мастерство</span>
+      </div>
+      <div class="school-feat">
+         <svg class="icon-svg" style="color:var(--gold-primary); flex-shrink:0" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+         <span>Мини-группы до 10 человек</span>
+      </div>
+    </div>
+    
+    <form id="schoolForm" style="margin-top:20px;">
+      <input type="text" name="parent" placeholder="Ваше Имя" class="input-field" required>
+      <input type="tel" name="phone" id="schoolPhone" placeholder="Телефон" class="input-field" required>
+      <input type="number" name="age" placeholder="Возраст (если для ребёнка)" class="input-field">
+      <button class="btn btn-primary" style="width:100%">Записаться на пробный</button>
+    </form>
+  </div>
+</div>
+
 <div class="modal" id="modalVideo">
   <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000">
     <button class="close-btn" onclick="closeVideo()">×</button>
@@ -780,6 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
 const TG_TOKEN = "7838972787:AAHaLNVe6xqEnzE5qy5Uh2TwSb66LWYIUhI";
 const CHAT_ID = 'ВСТАВЬ_СЮДА_ЦИФРЫ_CHAT_ID'; 
 
+// MAIN FORM
 document.getElementById('tgForm').onsubmit = async (e) => {
   e.preventDefault();
   if(document.getElementById('hp_website').value) return;
@@ -790,20 +819,46 @@ document.getElementById('tgForm').onsubmit = async (e) => {
   const fData = new FormData(e.target);
   const bonuses = document.getElementById('formBonuses').value || 'Нет';
   const services = document.getElementById('formServices').value || 'Не выбрано';
-  const text = `🔥 *Заявка с сайта!*\n\n👤 ${fData.get('name')}\n📱 ${fData.get('phone')}\n🎩 Услуги: ${services}\n🎁 Бонусы: ${bonuses}\n📝 Инфо: ${fData.get('msg')}`;
+  const text = `🔥 *Заявка ШОУ*\n\n👤 ${fData.get('name')}\n📱 ${fData.get('phone')}\n🎩 Услуги: ${services}\n🎁 Бонусы: ${bonuses}\n📝 Инфо: ${fData.get('msg')}`;
+  sendToTg(text, btn, oldText);
+};
+
+// SCHOOL FORM
+document.getElementById('schoolForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  const oldText = btn.innerText;
+  if(CHAT_ID.includes('CHAT_ID')) { alert('Вставь CHAT_ID в код!'); return; }
+  btn.innerText = 'Отправка...'; btn.disabled = true;
+  const fData = new FormData(e.target);
+  const text = `🎓 *Заявка ШКОЛА*\n\n👤 ${fData.get('parent')}\n📱 ${fData.get('phone')}\n👶 Возраст: ${fData.get('age')}`;
+  sendToTg(text, btn, oldText);
+};
+
+async function sendToTg(text, btn, oldText) {
   try {
     const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
     });
     if(res.ok) {
-      btn.innerText = 'Успешно!'; btn.style.background = '#28a745'; e.target.reset();
+      btn.innerText = 'Успешно!'; btn.style.background = '#28a745'; setTimeout(()=>{btn.innerText=oldText; btn.disabled=false; btn.style.background=''}, 3000);
       if(typeof ym !== 'undefined') ym(104290205,'reachGoal','order_submit');
     } else throw new Error();
   } catch (err) {
     alert('Ошибка отправки.'); btn.innerText = oldText; btn.disabled = false;
   }
-};
+}
+
+/* === SCHOOL MODAL LOGIC === */
+function openSchoolModal() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.querySelector('.burger').classList.remove('active');
+  document.getElementById('schoolModal').classList.add('open');
+}
+function closeSchoolModal() {
+  document.getElementById('schoolModal').classList.remove('open');
+}
 
 /* === WIZARD LOGIC === */
 function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); document.querySelector('.burger').classList.toggle('active'); }
