@@ -41,7 +41,7 @@ body {
   font-family: var(--ff-body); background: var(--bg); color: var(--text);
   line-height: 1.6; overflow-x: hidden; position: relative;
   opacity: 1; visibility: visible;
-  height: 100vh; overflow-y: hidden; /* Блок скролла пока идет загрузка */
+  height: 100vh; overflow-y: hidden; 
 }
 body.loaded { overflow-y: auto; height: auto; }
 
@@ -179,18 +179,10 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .nav-card h3 { font-family: var(--ff-head); font-size: 1.6rem; margin: 10px 0 0; line-height: 1.2; letter-spacing: 0.05em; text-transform: uppercase; }
 .nav-card span { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; font-weight: 700; display:block; opacity: 0.8; }
 
-/* === HERO (UPDATED POSITION) === */
-.hero { 
-  height: 100dvh; 
-  display: flex; 
-  /* ОПУСКАЕМ КОНТЕНТ ВНИЗ */
-  align-items: flex-end; 
-  padding-bottom: 120px; /* Отступ от низа, чтобы не прилипало к партнерам */
-  position: relative; overflow: hidden; 
-}
+/* === HERO === */
+.hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
 .hero-img {
   position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
-  /* FALLBACK IMAGE */
   background-image: url('images/hero-portrait.png'); 
   background-size: contain; background-repeat: no-repeat; background-position: bottom center;
   pointer-events: none; z-index: 1;
@@ -198,32 +190,12 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 #hero-particles-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2; }
 @media (max-width: 768px) { .hero-img { width: 100%; height: 100%; background-size: cover; background-position: center 20%; } }
 
-.hero-content { 
-  max-width: 700px; 
-  position: relative; 
-  z-index: 3; 
-  /* На мобильных чуть поднимаем, чтобы не перекрывалось меню браузера */
-  margin-bottom: 20px;
-}
+.hero-content { max-width: 700px; position: relative; z-index: 3; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
-
-/* ТЕКСТ ТЕПЕРЬ БЕЛЫЙ И ЧИТАЕМЫЙ */
-.hero-desc { 
-  font-size: 1.2rem; 
-  color: #fff; 
-  text-shadow: 0 2px 10px rgba(0,0,0,0.8); /* Тень для читаемости */
-  margin-bottom: 40px; 
-  max-width: 480px; 
-  opacity: 0; 
-  transform: translateY(20px); 
-}
-
+.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; opacity: 0; transform: translateY(20px); }
 .hero-btns { display:flex; gap:20px; flex-wrap:wrap; opacity:0; transform:translateY(20px); }
-.hero-stats { margin-top: 50px; display: flex; gap: 40px; opacity: 0; }
-.stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
-.stat p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* === PARTNERS MARQUEE (FIXED) === */
+/* === PARTNERS MARQUEE === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -327,13 +299,19 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .front { transform: rotateY(180deg); color: #000; }
 
 /* === REVIEWS (TELEGRAM STYLE) & FAQ === */
-.reviews-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; }
+.reviews-grid { 
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; 
+  /* COMPACT VIEW FOR REVIEWS TO PREVENT STRETCHING */
+  max-width: 850px; margin: 0 auto;
+}
 .tg-review-item { display: flex; flex-direction: column; align-items: center; width: 200px; }
 .tg-circle {
   width: 180px; height: 180px; border-radius: 50%; overflow: hidden;
   border: 3px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   position: relative; cursor: pointer; transition: transform 0.3s ease, border-color 0.3s;
   background: #000; margin-bottom: 15px;
+  /* PREVENT OVAL SHAPE */
+  flex-shrink: 0;
 }
 .tg-circle:hover { transform: scale(1.05); border-color: #fff; }
 .tg-circle video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
@@ -349,7 +327,10 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 }
 .story-viewer.active { opacity: 1; pointer-events: all; }
 .story-content {
-  position: relative; max-width: 90vw; max-height: 90vh; aspect-ratio: 9/16;
+  position: relative; 
+  /* PHONE SIZE LIMITS TO PREVENT GIANT VIDEO ON DESKTOP */
+  max-width: 420px; width: 90vw;
+  max-height: 90vh; aspect-ratio: 9/16;
   border-radius: 20px; overflow: hidden; box-shadow: 0 20px 80px rgba(0,0,0,0.8);
   border: 1px solid #333; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -399,20 +380,6 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .school-modal-content p { color: #ccc; text-align: center; margin-bottom: 20px; font-size: 0.95rem; }
 .school-features { display: grid; gap: 15px; margin-bottom: 25px; }
 .school-feat { display: flex; align-items: center; gap: 10px; color: #e9ecf4; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
-
-/* Video Widget */
-.video-widget {
-  position: fixed; bottom: 80px; right: 20px; width: 100px; height: 160px;
-  border-radius: 16px; overflow: hidden; z-index: 900; cursor: pointer;
-  border: 2px solid var(--gold-primary); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #000;
-}
-.video-widget:hover { transform: scale(1.05); }
-.video-widget.expanded { width: 300px; height: 520px; bottom: 20px; right: 20px; }
-.video-widget video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.vid-badge { position: absolute; top: -5px; left: -5px; background: #c00; color: #fff; font-size: 0.7rem; padding: 4px 8px; border-radius: 10px; font-weight: bold; animation: pulse 2s infinite; z-index: 3; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-@media (max-width: 600px) { .video-widget { bottom: 90px; right: 10px; width: 80px; height: 120px; } .video-widget.expanded { width: 90vw; height: 70vh; bottom: 80px; } }
 
 </style>
 </head>
@@ -478,15 +445,16 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
       <h1 class="hero-title">Магия <br><span class="text-gold">Высокого Уровня</span></h1>
       <p class="hero-desc">Премиальное шоу для тех, кто видел всё. Интеллектуально. Стильно. Дорого.</p>
       <div class="hero-btns">
-        
+        <a href="#calc" class="btn btn-primary">
+          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+          Рассчитать
+        </a>
         <button class="btn btn-glass" onclick="openVideo()">
           <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           Смотреть промо
         </button>
       </div>
-      <div class="hero-stats">
-        
-      </div>
+      
     </div>
   </div>
 </section>
