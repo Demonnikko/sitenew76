@@ -34,7 +34,7 @@
 
 /* === BASE === */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html { -webkit-font-smoothing: antialiased; cursor: none; scroll-padding-top: 80px; }
+html { -webkit-font-smoothing: antialiased; cursor: none; }
 @media (max-width: 900px) { html { cursor: auto; } }
 
 body {
@@ -368,20 +368,6 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .school-features { display: grid; gap: 15px; margin-bottom: 25px; }
 .school-feat { display: flex; align-items: center; gap: 10px; color: #e9ecf4; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
 
-/* Video Widget */
-.video-widget {
-  position: fixed; bottom: 80px; right: 20px; width: 100px; height: 160px;
-  border-radius: 16px; overflow: hidden; z-index: 900; cursor: pointer;
-  border: 2px solid var(--gold-primary); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #000;
-}
-.video-widget:hover { transform: scale(1.05); }
-.video-widget.expanded { width: 300px; height: 520px; bottom: 20px; right: 20px; }
-.video-widget video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.vid-badge { position: absolute; top: -5px; left: -5px; background: #c00; color: #fff; font-size: 0.7rem; padding: 4px 8px; border-radius: 10px; font-weight: bold; animation: pulse 2s infinite; z-index: 3; }
-@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-@media (max-width: 600px) { .video-widget { bottom: 90px; right: 10px; width: 80px; height: 120px; } .video-widget.expanded { width: 90vw; height: 70vh; bottom: 80px; } }
-
 /* Sticky Mobile Bar */
 .mobile-sticky-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 800; background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #333; padding: 12px 20px; display: flex; gap: 10px; align-items: center; justify-content: space-between; transform: translateY(100%); transition: 0.4s; }
 .mobile-sticky-bar.visible { transform: translateY(0); }
@@ -458,7 +444,7 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
         </a>
         <button class="btn btn-glass" onclick="openVideo()">
           <svg class="icon-svg" viewBox="0 0 24 24" style="width:20px;height:20px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Шоурил
+          Смотреть промо
         </button>
       </div>
       <div class="hero-stats">
@@ -635,11 +621,6 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </section>
 
 <footer style="text-align:center; padding:40px 0; color:#444; font-size:0.8rem;">© 2025 Дмитрий Костюк</footer>
-
-<div class="video-widget" id="vidWidget">
-  <div class="vid-badge">1</div>
-  <video id="myVid" src="https://assets.mixkit.co/videos/preview/mixkit-magician-performing-a-card-trick-3990-large.mp4" poster="images/portrait.jpg" loop muted playsinline></video>
-</div>
 
 <div class="mobile-sticky-bar" id="stickyBar">
   <a href="https://t.me/Dmitrokko" class="sticky-icon">
