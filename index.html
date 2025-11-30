@@ -40,12 +40,9 @@ html { -webkit-font-smoothing: antialiased; cursor: none; scroll-behavior: smoot
 body {
   font-family: var(--ff-body); background: var(--bg); color: var(--text);
   line-height: 1.6; overflow-x: hidden; position: relative;
-  opacity: 1; visibility: visible; /* ИСПРАВЛЕНО: Сайт виден всегда */
-  overflow-y: hidden; /* Блокируем скролл только на время заставки */
-  height: 100vh;
+  opacity: 1; visibility: visible;
+  height: 100vh; overflow-y: hidden; /* Блок скролла пока идет загрузка */
 }
-
-/* Класс для разблокировки скролла */
 body.loaded { overflow-y: auto; height: auto; }
 
 /* 3D BACKGROUND CANVAS */
@@ -67,11 +64,13 @@ body.loaded { overflow-y: auto; height: auto; }
   position: fixed; inset: 0; z-index: 10000;
   display: flex; pointer-events: none;
   background: transparent;
+  transition: opacity 1s ease, visibility 1s ease;
 }
-/* Подложка чтобы скрыть сайт пока кулисы закрыты */
+.curtain-wrapper.finished { opacity: 0; visibility: hidden; }
+
 .curtain-bg {
     position: absolute; inset: 0; background: #000; z-index: 1;
-    transition: opacity 0.5s ease;
+    transition: opacity 1s ease;
 }
 
 .curtain-spotlight {
@@ -188,7 +187,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
 .hero-img {
   position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
-  /* ЗАПАСНОЙ ФОН (если скрипт не сработает) */
+  /* FALLBACK IMAGE */
   background-image: url('images/hero-portrait.png'); 
   background-size: contain; background-repeat: no-repeat; background-position: bottom center;
   pointer-events: none; z-index: 1;
@@ -198,9 +197,12 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 
 .hero-content { max-width: 700px; position: relative; z-index: 2; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
-.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; opacity: 0; transform: translateY(20px); }
-.hero-btns { opacity: 0; transform: translateY(20px); display:flex; gap:20px; flex-wrap:wrap; }
-.hero-stats { margin-top: 50px; display: flex; gap: 40px; opacity: 0; }
+.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; }
+.hero-btns { 
+  display:flex; gap:20px; flex-wrap:wrap;
+  /* ИСПРАВЛЕНО: Убрано opacity:0, чтобы кнопки были видны сразу */
+}
+.hero-stats { margin-top: 50px; display: flex; gap: 40px; }
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
@@ -696,15 +698,13 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 /* === CONTENT GENERATION === */
 window.addEventListener("DOMContentLoaded", () => {
   
-  // 1. CURTAIN ANIMATION (FIXED)
+  // 1. CURTAIN ANIMATION (FIXED TIMING & SCROLL UNLOCK)
   const tl = gsap.timeline({
       onComplete: () => {
-          // UNLOCK SCROLL
-          document.body.classList.add('loaded');
-          // Remove curtains from DOM completely
+          document.body.classList.add('loaded'); // Unlock scroll
           const c = document.querySelector('.curtain-wrapper');
           if(c) {
-             c.style.opacity = 0;
+             c.classList.add('finished'); // Hide curtains
              setTimeout(() => c.style.display = 'none', 1000);
           }
       }
@@ -718,9 +718,9 @@ window.addEventListener("DOMContentLoaded", () => {
     .to(".curtain-content", { opacity: 0, scale: 1.2, duration: 1.5, ease: "power2.in" }, "<")
     // BG Fade out (reveals site)
     .to(".curtain-bg", { opacity: 0, duration: 1 }, "-=2.0")
-    // Magic Particles
+    // Magic Particles Start
     .to({}, { duration: 3, onUpdate: function() { if(heroParticlesMaterial) { gsap.to(heroParticlesMaterial.uniforms.uProgress, { value: 1, duration: 4, ease: "power2.out" }); } } }, "-=2.0")
-    // Content
+    // Content Animation
     .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.5")
     .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.8")
     .from(".hero-btns", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
