@@ -191,7 +191,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* === PARTNERS MARQUEE === */
+/* === PARTNERS MARQUEE (FIXED) === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -750,6 +750,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initThreeJS();
   initHeroParticles();
   updateServices();
+  initGame();
   
   // Animations
   document.body.style.opacity = 1; document.body.style.visibility = "visible";
@@ -955,6 +956,53 @@ function calcResult(){
   document.getElementById('formBonuses').value = activeBonuses.join(', ');
   document.getElementById('formServices').value = selectedServices.map(s => s.name).join(', ') + ` [${discReason}]`;
   nextStep(3);
+}
+
+/* === GAME LOGIC (FIXED) === */
+const deck = document.getElementById('gameDeck');
+const msg = document.getElementById('gameMsg');
+const suits = ['♠', '♥', '♣', '♦'];
+const ranks = ['J', 'Q', 'K', 'A'];
+function initGame() {
+  if (!deck) return;
+  deck.innerHTML = ''; 
+  const lastPlayed = parseInt(localStorage.getItem('game_timestamp')) || 0;
+  const hasWon = localStorage.getItem('game_win') === 'true';
+  const now = Date.now();
+  const cooldown = 24 * 60 * 60 * 1000;
+  const timePassed = now - lastPlayed;
+  
+  if (timePassed >= cooldown) { localStorage.removeItem('game_win'); } // Reset win status if cooldown passed
+
+  if (lastPlayed && timePassed < cooldown) {
+    const hoursLeft = Math.ceil((cooldown - timePassed) / (1000 * 60 * 60));
+    deck.innerHTML = `<div style="padding:30px; border:1px solid #333; border-radius:16px; background:rgba(255,255,255,0.05); backdrop-filter:blur(5px);"><h3 style="margin-bottom:10px; color:#fff;">⏳ Магия восстанавливается</h3><p style="color:#888; font-size:0.9rem;">${hasWon ? 'Вы уже выиграли свою скидку!' : 'Попытка потрачена.'} <br> Следующий шанс через <strong>${hoursLeft} ч.</strong></p></div>`;
+    if (hasWon) msg.innerHTML = '<span style="color:var(--gold-primary)">Скидка 20% активирована</span>';
+    return;
+  }
+  const winIdx = Math.floor(Math.random() * 3);
+  for (let i = 0; i < 3; i++) {
+    const isWin = (i === winIdx);
+    let rSuit, rRank;
+    do { rSuit = suits[Math.floor(Math.random() * 4)]; rRank = ranks[Math.floor(Math.random() * 4)]; } while (rSuit === '♠' && rRank === 'A');
+    const suit = isWin ? '♠' : rSuit; const rank = isWin ? 'A' : rRank;
+    const card = document.createElement('div'); card.className = 'card-play';
+    card.innerHTML = `<div class="face back"></div><div class="face front" style="color:${['♠', '♣'].includes(suit) ? '#000' : '#c00'}">${rank}${suit}</div>`;
+    card.onclick = () => {
+      if (deck.classList.contains('played')) return;
+      localStorage.setItem('game_timestamp', Date.now()); deck.classList.add('played');
+      document.querySelectorAll('.card-play').forEach(el => el.classList.add('flipped'));
+      if (isWin) {
+        msg.innerHTML = '<span style="color:var(--gold-primary); text-shadow:0 0 10px var(--gold-primary);">✨ ПОБЕДА! Скидка 20%</span>';
+        localStorage.setItem('game_win', 'true');
+      } else {
+        msg.textContent = 'Увы, магия не сработала. Попробуйте завтра.';
+        localStorage.setItem('game_win', 'false');
+      }
+      if(typeof calcResult === 'function') setTimeout(calcResult, 1000);
+    };
+    deck.appendChild(card);
+  }
 }
 
 /* === THREE.JS HERO PARTICLES === */
