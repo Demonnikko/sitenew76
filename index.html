@@ -34,7 +34,7 @@
 
 /* === BASE === */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html { -webkit-font-smoothing: antialiased; cursor: none; }
+html { -webkit-font-smoothing: antialiased; cursor: none; scroll-padding-top: 80px; }
 @media (max-width: 900px) { html { cursor: auto; } }
 
 body {
@@ -191,7 +191,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* === PARTNERS MARQUEE (FIXED) === */
+/* === PARTNERS MARQUEE === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -773,6 +773,14 @@ window.addEventListener("DOMContentLoaded", () => {
   gsap.utils.toArray(".gs-reveal").forEach(elem => {
     gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 80%" }, y: 40, opacity: 0, duration: 1, ease: "power3.out" });
   });
+  
+  // Date Picker Min Date Fix
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    dateInput.min = d.toISOString().split('T')[0];
+  }
 });
 
 // FAQ LOGIC
@@ -926,6 +934,9 @@ function nextStep(n){
   document.querySelectorAll('.wizard-step').forEach(e=>e.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   document.getElementById('wizProgress').style.width=(n*33)+'%';
+  
+  // AUTO SCROLL FIX
+  document.getElementById('calc').scrollIntoView({behavior: 'smooth'});
 }
 function calcResult(){
   if (selectedServices.length === 0) { alert('Выберите хотя бы одну услугу'); return; }
