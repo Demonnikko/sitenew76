@@ -191,7 +191,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* === PARTNERS MARQUEE === */
+/* === PARTNERS MARQUEE (FIXED) === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -532,7 +532,7 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </section>
 
 <section id="calc" class="section-py">
-  <div class="container gs-reveal">
+  <div class="container gs-reveal" id="calc">
     <h2 class="text-center" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:40px;">Стоимость за 3 шага</h2>
     <div class="wizard-box">
       <div class="wizard-progress"><div class="progress-bar" id="wizProgress"></div></div>
@@ -931,12 +931,28 @@ function toggleService(btn, name, price) {
 }
 function nextStep(n){
   if(n===2 && (!els.area.value||!els.city.value)){alert('Выберите регион и город');return;}
+  
+  // === NEW DATE VALIDATION ===
+  if(n===2 && els.date.value) {
+      const selected = new Date(els.date.value);
+      const now = new Date();
+      now.setHours(0,0,0,0); // Today 00:00
+      
+      // Check if selected date is today or past
+      if (selected <= now) {
+          alert('Бронирование возможно только с завтрашнего дня.');
+          return; // Stop here
+      }
+  }
+
   document.querySelectorAll('.wizard-step').forEach(e=>e.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   document.getElementById('wizProgress').style.width=(n*33)+'%';
   
-  // AUTO SCROLL FIX
-  document.getElementById('calc').scrollIntoView({behavior: 'smooth'});
+  // AUTO SCROLL FIX (Smooth scroll to top of calculator)
+  if (n===3) {
+      document.getElementById('calc').scrollIntoView({behavior: 'smooth'});
+  }
 }
 function calcResult(){
   if (selectedServices.length === 0) { alert('Выберите хотя бы одну услугу'); return; }
@@ -958,62 +974,19 @@ function calcResult(){
   document.getElementById('rCoef').innerText=coef>1?'x'+coef:'1.0';
   document.getElementById('rDisc').innerText=disc?`-${disc} ₽ (${discReason})`:'0 ₽';
   document.getElementById('rTotal').innerText=total.toLocaleString()+' ₽';
-  /* BONUS TIERS */
+  
+  /* BONUS TIERS UPDATED */
   const bContainer = document.getElementById('bonusContainer'); bContainer.innerHTML = ''; 
   let activeBonuses = [];
   if (total >= 35000) { activeBonuses.push("🔥 Опасный трюк"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-3"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg><div class="bonus-text"><strong>Экстрим</strong>Опасный трюк в подарок!</div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
   if (total >= 20000) { activeBonuses.push("🎁 Персональный фокус"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-2"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg><div class="bonus-text"><strong>VIP</strong>Персональный фокус</div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
-  if (total >= 15000) { activeBonuses.push("🎫 2 Билета"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-1"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg><div class="bonus-text"><strong>Бонус</strong>2 Билета на шоу <span class="bonus-note">(Город и дату уточняйте)</span></div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  
+  /* CHANGED TEXT HERE */
+  if (total >= 15000) { activeBonuses.push("🎫 2 Билета"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-1"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg><div class="bonus-text"><strong>Бонус</strong>2 Билета на концертное шоу <span class="bonus-note">(Город и дату уточняйте)</span></div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  
   document.getElementById('formBonuses').value = activeBonuses.join(', ');
   document.getElementById('formServices').value = selectedServices.map(s => s.name).join(', ') + ` [${discReason}]`;
   nextStep(3);
-}
-
-/* === GAME LOGIC (FIXED) === */
-const deck = document.getElementById('gameDeck');
-const msg = document.getElementById('gameMsg');
-const suits = ['♠', '♥', '♣', '♦'];
-const ranks = ['J', 'Q', 'K', 'A'];
-function initGame() {
-  if (!deck) return;
-  deck.innerHTML = ''; 
-  const lastPlayed = parseInt(localStorage.getItem('game_timestamp')) || 0;
-  const hasWon = localStorage.getItem('game_win') === 'true';
-  const now = Date.now();
-  const cooldown = 24 * 60 * 60 * 1000;
-  const timePassed = now - lastPlayed;
-  
-  if (timePassed >= cooldown) { localStorage.removeItem('game_win'); } // Reset win status if cooldown passed
-
-  if (lastPlayed && timePassed < cooldown) {
-    const hoursLeft = Math.ceil((cooldown - timePassed) / (1000 * 60 * 60));
-    deck.innerHTML = `<div style="padding:30px; border:1px solid #333; border-radius:16px; background:rgba(255,255,255,0.05); backdrop-filter:blur(5px);"><h3 style="margin-bottom:10px; color:#fff;">⏳ Магия восстанавливается</h3><p style="color:#888; font-size:0.9rem;">${hasWon ? 'Вы уже выиграли свою скидку!' : 'Попытка потрачена.'} <br> Следующий шанс через <strong>${hoursLeft} ч.</strong></p></div>`;
-    if (hasWon) msg.innerHTML = '<span style="color:var(--gold-primary)">Скидка 20% активирована</span>';
-    return;
-  }
-  const winIdx = Math.floor(Math.random() * 3);
-  for (let i = 0; i < 3; i++) {
-    const isWin = (i === winIdx);
-    let rSuit, rRank;
-    do { rSuit = suits[Math.floor(Math.random() * 4)]; rRank = ranks[Math.floor(Math.random() * 4)]; } while (rSuit === '♠' && rRank === 'A');
-    const suit = isWin ? '♠' : rSuit; const rank = isWin ? 'A' : rRank;
-    const card = document.createElement('div'); card.className = 'card-play';
-    card.innerHTML = `<div class="face back"></div><div class="face front" style="color:${['♠', '♣'].includes(suit) ? '#000' : '#c00'}">${rank}${suit}</div>`;
-    card.onclick = () => {
-      if (deck.classList.contains('played')) return;
-      localStorage.setItem('game_timestamp', Date.now()); deck.classList.add('played');
-      document.querySelectorAll('.card-play').forEach(el => el.classList.add('flipped'));
-      if (isWin) {
-        msg.innerHTML = '<span style="color:var(--gold-primary); text-shadow:0 0 10px var(--gold-primary);">✨ ПОБЕДА! Скидка 20%</span>';
-        localStorage.setItem('game_win', 'true');
-      } else {
-        msg.textContent = 'Увы, магия не сработала. Попробуйте завтра.';
-        localStorage.setItem('game_win', 'false');
-      }
-      if(typeof calcResult === 'function') setTimeout(calcResult, 1000);
-    };
-    deck.appendChild(card);
-  }
 }
 
 /* === THREE.JS HERO PARTICLES === */
