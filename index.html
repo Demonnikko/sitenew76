@@ -34,13 +34,14 @@
 
 /* === BASE === */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html { -webkit-font-smoothing: antialiased; cursor: none; }
+html { -webkit-font-smoothing: antialiased; cursor: none; scroll-behavior: smooth; }
 @media (max-width: 900px) { html { cursor: auto; } }
 
 body {
   font-family: var(--ff-body); background: var(--bg); color: var(--text);
   line-height: 1.6; overflow-x: hidden; position: relative;
-  opacity: 1; visibility: visible; /* Force visible */
+  /* Важно: изначально скрываем скроллбар, пока идет прелоадер */
+  overflow-y: hidden; 
 }
 
 /* 3D BACKGROUND CANVAS */
@@ -62,9 +63,10 @@ body {
   position: fixed; inset: 0; z-index: 10000;
   display: flex; pointer-events: none;
   background: #000;
-  transition: transform 1.5s ease-in-out; /* CSS Fallback Animation */
+  transition: opacity 1s ease, visibility 1s ease; /* Fallback transition */
 }
-.curtain-wrapper.hidden { transform: translateY(-100%); }
+/* Класс для скрытия кулис */
+.curtain-wrapper.finished { opacity: 0; visibility: hidden; pointer-events: none; }
 
 .curtain-spotlight {
   position: absolute; inset: 0; z-index: 5;
@@ -74,10 +76,11 @@ body {
 .curtain-panel {
   width: 50%; height: 100%;
   position: relative; z-index: 2;
-  background-color: #4a0404;
+  background-color: #4a0404; /* Royal Red */
   background-image: repeating-linear-gradient(90deg, 
       rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(255,50,50,0.1) 25%, rgba(80,0,0,0.5) 35%, rgba(0,0,0,0.8) 50%
   );
+  filter: url(#velvet-noise) contrast(1.1) brightness(0.9);
   box-shadow: inset 0 0 150px rgba(0,0,0,1);
   transform-origin: top; will-change: transform;
 }
@@ -92,7 +95,7 @@ body {
 .curtain-content {
   position: absolute; top: 45%; left: 50%;
   transform: translate(-50%, -50%); z-index: 10;
-  text-align: center; width: 100%;
+  text-align: center; width: 100%; perspective: 1000px;
 }
 .curtain-text {
   font-family: var(--ff-head); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; 
@@ -101,11 +104,12 @@ body {
   -webkit-background-clip: text; background-clip: text;
   filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5)) drop-shadow(0 2px 0 #000);
   letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0; transform: scale(0.9);
 }
 .curtain-subtext {
   font-family: var(--ff-body); font-size: 0.9rem; 
   color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.3em;
-  margin-top: 10px; 
+  margin-top: 10px; opacity: 0;
 }
 
 /* === UI UTILS === */
@@ -114,7 +118,6 @@ body {
 .text-gold { background: linear-gradient(to right, #D4AF37, #FFF5C3, #D4AF37); -webkit-background-clip: text; color: transparent; background-clip: text; font-weight: 700; }
 .text-center { text-align: center; }
 .icon-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.icon-large { width: 48px; height: 48px; stroke-width: 1.5; }
 
 /* Buttons */
 .btn {
@@ -127,7 +130,6 @@ body {
 .btn-primary:hover { box-shadow: 0 10px 40px rgba(212, 175, 55, 0.5); transform: translateY(-2px); }
 .btn-glass { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; backdrop-filter: blur(4px); }
 .btn-glass:hover { border-color: var(--gold-primary); background: rgba(255,255,255,0.1); }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(1); }
 
 /* Inputs */
 .input-field {
@@ -142,7 +144,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .header { position: fixed; top: 0; inset-inline: 0; z-index: 100; padding: 15px 0; transition: 0.4s; }
 .header.scrolled { background: rgba(5,5,5,0.95); backdrop-filter: blur(12px); padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .nav-flex { display: flex; justify-content: space-between; align-items: center; }
-.logo { font-family: var(--ff-head); font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; }
+.logo { font-family: var(--ff-head); font-size: 1.5rem; font-weight: 900; color: #fff; display: flex; align-items: center; text-decoration: none; }
 .logo span { color: var(--gold-primary); margin-left: 5px; }
 .burger { width: 40px; height: 40px; background: none; display: flex; flex-direction: column; justify-content: center; gap: 6px; border:none; cursor:pointer; }
 .burger span { width: 28px; height: 2px; background: #fff; align-self: flex-end; transition: 0.3s; }
@@ -178,7 +180,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
 .hero-img {
   position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
-  /* FALLBACK IMAGE */
+  /* FALLBACK: Если частицы не прогрузились, будет картинка */
   background-image: url('images/hero-portrait.png'); 
   background-size: contain; background-repeat: no-repeat; background-position: bottom center;
   pointer-events: none; z-index: 1;
@@ -188,9 +190,9 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 
 .hero-content { max-width: 700px; position: relative; z-index: 2; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
-.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; }
-.hero-btns { display:flex; gap:20px; flex-wrap:wrap; }
-.hero-stats { margin-top: 50px; display: flex; gap: 40px; }
+.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; opacity: 0; transform: translateY(20px); }
+.hero-btns { opacity: 0; transform: translateY(20px); display:flex; gap:20px; flex-wrap:wrap; }
+.hero-stats { margin-top: 50px; display: flex; gap: 40px; opacity: 0; }
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
@@ -409,7 +411,7 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 
 <header class="header">
   <div class="container nav-flex">
-    <div class="logo">KOSTYUK <span>PROJECT</span></div>
+    <a href="#" class="logo">KOSTYUK <span>PROJECT</span></a>
     
     <button class="burger" onclick="toggleMenu()">
       <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -684,6 +686,16 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 <script>
 /* === CONTENT GENERATION (UPDATED FAQ) === */
 window.addEventListener("DOMContentLoaded", () => {
+  // SAFETY NET FOR CURTAINS
+  setTimeout(() => {
+     const c = document.querySelector('.curtain-wrapper');
+     if(c) c.style.pointerEvents = 'none'; 
+     // Если анимация зависла, делаем кулисы прозрачными для клика
+     if(c && getComputedStyle(c).opacity === '1') {
+         c.classList.add('finished'); // Добавим класс через 4 сек
+     }
+  }, 4000);
+
   // FAQ DATA
   const faqData = [
     { q: "За сколько бронировать дату?", a: "Обычно за 1–2 недели; популярные даты — за месяц и раньше." },
@@ -737,7 +749,6 @@ window.addEventListener("DOMContentLoaded", () => {
   initGame();
   
   // Animations
-  document.body.style.opacity = 1; document.body.style.visibility = "visible";
   const tl = gsap.timeline();
   tl.to(".curtain-text", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" })
     .to(".curtain-subtext", { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }, "-=1")
@@ -791,6 +802,17 @@ function closeReview() {
   const viewVid = document.getElementById('storyVideo');
   viewer.classList.remove('active');
   setTimeout(() => { viewVid.pause(); viewVid.src = ""; }, 300);
+}
+
+/* === VIDEO PROMO LOGIC === */
+function openVideo(){ 
+  document.getElementById('modalVideo').classList.add('open'); 
+  // Вставьте сюда вашу ссылку на промо
+  document.getElementById('vidContainer').innerHTML = '<iframe src="https://rutube.ru/play/embed/a692a6ad3b922abc4cfad5be5898431b?autoplay=1" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>'; 
+}
+function closeVideo(){ 
+  document.getElementById('modalVideo').classList.remove('open'); 
+  document.getElementById('vidContainer').innerHTML = ''; 
 }
 
 /* === AUDIO UX === */
@@ -971,6 +993,53 @@ function calcResult(){
   document.getElementById('formBonuses').value = activeBonuses.join(', ');
   document.getElementById('formServices').value = selectedServices.map(s => s.name).join(', ') + ` [${discReason}]`;
   nextStep(3);
+}
+
+/* === GAME LOGIC (FIXED) === */
+const deck = document.getElementById('gameDeck');
+const msg = document.getElementById('gameMsg');
+const suits = ['♠', '♥', '♣', '♦'];
+const ranks = ['J', 'Q', 'K', 'A'];
+function initGame() {
+  if (!deck) return;
+  deck.innerHTML = ''; 
+  const lastPlayed = parseInt(localStorage.getItem('game_timestamp')) || 0;
+  const hasWon = localStorage.getItem('game_win') === 'true';
+  const now = Date.now();
+  const cooldown = 24 * 60 * 60 * 1000;
+  const timePassed = now - lastPlayed;
+  
+  if (timePassed >= cooldown) { localStorage.removeItem('game_win'); } // Reset win status if cooldown passed
+
+  if (lastPlayed && timePassed < cooldown) {
+    const hoursLeft = Math.ceil((cooldown - timePassed) / (1000 * 60 * 60));
+    deck.innerHTML = `<div style="padding:30px; border:1px solid #333; border-radius:16px; background:rgba(255,255,255,0.05); backdrop-filter:blur(5px);"><h3 style="margin-bottom:10px; color:#fff;">⏳ Магия восстанавливается</h3><p style="color:#888; font-size:0.9rem;">${hasWon ? 'Вы уже выиграли свою скидку!' : 'Попытка потрачена.'} <br> Следующий шанс через <strong>${hoursLeft} ч.</strong></p></div>`;
+    if (hasWon) msg.innerHTML = '<span style="color:var(--gold-primary)">Скидка 20% активирована</span>';
+    return;
+  }
+  const winIdx = Math.floor(Math.random() * 3);
+  for (let i = 0; i < 3; i++) {
+    const isWin = (i === winIdx);
+    let rSuit, rRank;
+    do { rSuit = suits[Math.floor(Math.random() * 4)]; rRank = ranks[Math.floor(Math.random() * 4)]; } while (rSuit === '♠' && rRank === 'A');
+    const suit = isWin ? '♠' : rSuit; const rank = isWin ? 'A' : rRank;
+    const card = document.createElement('div'); card.className = 'card-play';
+    card.innerHTML = `<div class="face back"></div><div class="face front" style="color:${['♠', '♣'].includes(suit) ? '#000' : '#c00'}">${rank}${suit}</div>`;
+    card.onclick = () => {
+      if (deck.classList.contains('played')) return;
+      localStorage.setItem('game_timestamp', Date.now()); deck.classList.add('played');
+      document.querySelectorAll('.card-play').forEach(el => el.classList.add('flipped'));
+      if (isWin) {
+        msg.innerHTML = '<span style="color:var(--gold-primary); text-shadow:0 0 10px var(--gold-primary);">✨ ПОБЕДА! Скидка 20%</span>';
+        localStorage.setItem('game_win', 'true');
+      } else {
+        msg.textContent = 'Увы, магия не сработала. Попробуйте завтра.';
+        localStorage.setItem('game_win', 'false');
+      }
+      if(typeof calcResult === 'function') setTimeout(calcResult, 1000);
+    };
+    deck.appendChild(card);
+  }
 }
 
 /* === THREE.JS HERO PARTICLES === */
