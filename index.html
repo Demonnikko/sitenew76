@@ -18,6 +18,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
+<script>
+    // СРАЗУ СКРОЛЛИМ НАВЕРХ (До загрузки всего остального)
+    if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+    } else {
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
+    }
+</script>
+
 <style>
 :root {
   --bg: #050505;
@@ -77,8 +88,10 @@ body.loaded { overflow-y: auto; height: auto; }
 .curtain-panel {
   width: 50%; height: 100%;
   position: relative; z-index: 2;
-  background-color: #4a0404; 
-  background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(255,50,50,0.1) 25%, rgba(80,0,0,0.5) 35%, rgba(0,0,0,0.8) 50%);
+  background-color: #4a0404; /* Royal Red */
+  background-image: repeating-linear-gradient(90deg, 
+      rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(255,50,50,0.1) 25%, rgba(80,0,0,0.5) 35%, rgba(0,0,0,0.8) 50%
+  );
   filter: url(#velvet-noise) contrast(1.1) brightness(0.9);
   box-shadow: inset 0 0 150px rgba(0,0,0,1);
   transform-origin: top; will-change: transform;
@@ -188,12 +201,16 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 #hero-particles-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2; }
 @media (max-width: 768px) { .hero-img { width: 100%; height: 100%; background-size: cover; background-position: center 20%; } }
 
-.hero-content { max-width: 700px; position: relative; z-index: 3; /* ПОВЕРХ ЧАСТИЦ */ }
+.hero-content { max-width: 700px; position: relative; z-index: 2; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
-.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; opacity: 0; transform: translateY(20px); }
-.hero-btns { display:flex; gap:20px; flex-wrap:wrap; opacity:0; transform:translateY(20px); } /* Вернул анимацию но осторожно */
+.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; }
+.hero-btns { display:flex; gap:20px; flex-wrap:wrap; }
 
-/* === PARTNERS MARQUEE === */
+.hero-stats { margin-top: 50px; display: flex; gap: 40px; opacity: 0; }
+.stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
+.stat p { color: var(--text-muted); font-size: 0.9rem; }
+
+/* === PARTNERS MARQUEE (FIXED) === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -424,9 +441,7 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </div>
 
 <section id="hero" class="hero">
-  <div class="hero-img">
-    <div id="hero-particles-container"></div>
-  </div>
+  <div class="hero-img"></div>
   
   <div class="container">
     <div class="hero-content">
@@ -442,7 +457,6 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
           Смотреть промо
         </button>
       </div>
-      
     </div>
   </div>
 </section>
@@ -666,13 +680,13 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 /* === CONTENT GENERATION === */
 window.addEventListener("DOMContentLoaded", () => {
   
-  // 1. CURTAIN ANIMATION (FIXED TIMING & SCROLL UNLOCK)
+  // 1. CURTAIN ANIMATION (FIXED)
   const tl = gsap.timeline({
       onComplete: () => {
-          document.body.classList.add('loaded'); // Unlock scroll
+          document.body.classList.add('loaded'); // Разблокируем скролл
           const c = document.querySelector('.curtain-wrapper');
           if(c) {
-             c.classList.add('finished'); // Hide curtains
+             c.style.opacity = 0;
              setTimeout(() => c.style.display = 'none', 1000);
           }
       }
@@ -688,7 +702,7 @@ window.addEventListener("DOMContentLoaded", () => {
     .to(".curtain-bg", { opacity: 0, duration: 1 }, "-=2.0")
     // Magic Particles Start
     .to({}, { duration: 3, onUpdate: function() { if(heroParticlesMaterial) { gsap.to(heroParticlesMaterial.uniforms.uProgress, { value: 1, duration: 4, ease: "power2.out" }); } } }, "-=2.0")
-    // Content Animation (ТЕКСТ БОЛЬШЕ НЕ СКРЫТ, НО АНИМИРУЕТСЯ)
+    // Content Animation
     .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.5")
     .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.8")
     .from(".hero-btns", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
@@ -927,10 +941,12 @@ function nextStep(n){
   if(n===2 && els.date.value) {
       const selected = new Date(els.date.value);
       const now = new Date();
-      now.setHours(0,0,0,0); 
+      now.setHours(0,0,0,0); // Today 00:00
+      
+      // Check if selected date is today or past
       if (selected <= now) {
           alert('Бронирование возможно только с завтрашнего дня.');
-          return; 
+          return; // Stop here
       }
   }
 
@@ -938,7 +954,7 @@ function nextStep(n){
   document.getElementById('step'+n).classList.add('active');
   document.getElementById('wizProgress').style.width=(n*33)+'%';
   
-  // AUTO SCROLL FIX
+  // AUTO SCROLL FIX (Smooth scroll to top of calculator)
   if (n===3) {
       document.getElementById('calc').scrollIntoView({behavior: 'smooth'});
   }
@@ -963,12 +979,16 @@ function calcResult(){
   document.getElementById('rCoef').innerText=coef>1?'x'+coef:'1.0';
   document.getElementById('rDisc').innerText=disc?`-${disc} ₽ (${discReason})`:'0 ₽';
   document.getElementById('rTotal').innerText=total.toLocaleString()+' ₽';
+  
   /* BONUS TIERS UPDATED */
   const bContainer = document.getElementById('bonusContainer'); bContainer.innerHTML = ''; 
   let activeBonuses = [];
   if (total >= 35000) { activeBonuses.push("🔥 Опасный трюк"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-3"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg><div class="bonus-text"><strong>Экстрим</strong>Опасный трюк в подарок!</div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
   if (total >= 20000) { activeBonuses.push("🎁 Персональный фокус"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-2"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg><div class="bonus-text"><strong>VIP</strong>Персональный фокус</div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  
+  /* CHANGED TEXT HERE */
   if (total >= 15000) { activeBonuses.push("🎫 2 Билета"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-1"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg><div class="bonus-text"><strong>Бонус</strong>2 Билета на концертное шоу <span class="bonus-note">(Город и дату уточняйте)</span></div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  
   document.getElementById('formBonuses').value = activeBonuses.join(', ');
   document.getElementById('formServices').value = selectedServices.map(s => s.name).join(', ') + ` [${discReason}]`;
   nextStep(3);
@@ -988,7 +1008,7 @@ function initGame() {
   const cooldown = 24 * 60 * 60 * 1000;
   const timePassed = now - lastPlayed;
   
-  if (timePassed >= cooldown) { localStorage.removeItem('game_win'); } 
+  if (timePassed >= cooldown) { localStorage.removeItem('game_win'); } // Reset win status if cooldown passed
 
   if (lastPlayed && timePassed < cooldown) {
     const hoursLeft = Math.ceil((cooldown - timePassed) / (1000 * 60 * 60));
@@ -1020,61 +1040,6 @@ function initGame() {
     deck.appendChild(card);
   }
 }
-
-/* === THREE.JS HERO PARTICLES (FIXED FOR CORS) === */
-let heroParticlesMaterial;
-function initHeroParticles() {
-  const container = document.getElementById('hero-particles-container'); if (!container) return;
-  const scene = new THREE.Scene();
-  const width = container.offsetWidth; const height = container.offsetHeight;
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000); camera.position.z = 100;
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
-  
-  const img = new Image(); 
-  img.crossOrigin = "Anonymous"; // FIX CORS
-  img.src = 'images/hero-portrait.png'; 
-  
-  img.onload = () => {
-    const imageCanvas = document.createElement('canvas'); const ctx = imageCanvas.getContext('2d');
-    const particleDensity = window.innerWidth < 768 ? 6 : 4;
-    const iw = img.width; const ih = img.height;
-    imageCanvas.width = iw; imageCanvas.height = ih;
-    ctx.drawImage(img, 0, 0); const data = ctx.getImageData(0, 0, iw, ih).data;
-    const geometry = new THREE.BufferGeometry();
-    const positions = []; const colors = []; const randoms = [];
-    const ratio = window.innerWidth < 768 ? 0.15 : 0.25; 
-    for (let y = 0; y < ih; y += particleDensity) {
-      for (let x = 0; x < iw; x += particleDensity) {
-        const i = (y * iw + x) * 4;
-        const r = data[i] / 255; const g = data[i + 1] / 255; const b = data[i + 2] / 255; const a = data[i + 3];
-        if (a > 20 && (r+g+b) > 0.1) {
-          const px = (x - iw / 2) * ratio; const py = -(y - ih / 2) * ratio - 10;
-          positions.push(px, py, 0); colors.push(r, g, b);
-          randoms.push((Math.random()-0.5)*400, (Math.random()-0.5)*400, (Math.random()-0.5)*400);
-        }
-      }
-    }
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    geometry.setAttribute('aRandom', new THREE.Float32BufferAttribute(randoms, 3));
-    heroParticlesMaterial = new THREE.ShaderMaterial({
-      vertexShader: `uniform float uTime; uniform float uProgress; attribute vec3 aRandom; varying vec3 vColor; void main() { vColor = color; vec3 pos = mix(aRandom, position, uProgress); pos.x += sin(uTime * 2.0 + position.y) * 0.5 * uProgress; pos.z += cos(uTime * 1.5 + position.x) * 0.5 * uProgress; vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0); gl_PointSize = (3.0 * uProgress + 1.0) * (50.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,
-      fragmentShader: `varying vec3 vColor; void main() { float dist = length(gl_PointCoord - vec2(0.5)); if (dist > 0.5) discard; gl_FragColor = vec4(vColor, 1.0); }`,
-      uniforms: { uTime: { value: 0 }, uProgress: { value: 0 } },
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-    });
-    const particles = new THREE.Points(geometry, heroParticlesMaterial);
-    if(window.innerWidth > 768) particles.position.x = 25; else particles.position.y = 10;
-    scene.add(particles);
-    const clock = new THREE.Clock();
-    function animate() { requestAnimationFrame(animate); const time = clock.getElapsedTime(); heroParticlesMaterial.uniforms.uTime.value = time; renderer.render(scene, camera); }
-    animate();
-  };
-  window.addEventListener('resize', () => { const w = container.offsetWidth; const h = container.offsetHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); });
-}
-initHeroParticles();
 
 /* === BACKGROUND PARTICLES (Original) === */
 const initThreeJS = () => {
