@@ -149,7 +149,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .burger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 6px); }
 .burger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -6px); }
 
-/* === SPLIT MENU (PREMIUM RUSSIAN DESIGN) === */
+/* === SPLIT MENU === */
 .mobile-menu {
   position: fixed; inset: 0; background: #000; z-index: 99;
   display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2rem;
@@ -191,7 +191,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* === PARTNERS MARQUEE (FIXED & SMOOTH) === */
+/* === PARTNERS MARQUEE === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -332,18 +332,18 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 }
 .story-close:hover { background: #fff; color: #000; }
 
-.faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)); gap: 15px; }
+/* === FAQ UPDATE === */
+.faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)); gap: 15px; transition: max-height 0.5s ease; }
 @media (min-width: 768px) { .faq-grid { grid-template-columns: 1fr 1fr; } }
+.faq-item.hidden { display: none; }
+.faq-item.fade-in { animation: fadeIn 0.5s forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.faq-controls { text-align: center; margin-top: 30px; grid-column: 1 / -1; }
 details { background: var(--bg-panel); border: 1px solid #222; border-radius: 12px; overflow: hidden; transition: 0.3s; backdrop-filter: blur(5px); }
 details[open] { border-color: var(--gold-primary); background: rgba(255,255,255,0.05); }
 summary { padding: 16px 20px; cursor: pointer; font-weight: 600; list-style: none; position: relative; font-size: 0.95rem; padding-right: 40px; }
-summary::after { 
-  content: ''; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; 
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E") no-repeat center;
-}
-details[open] summary::after { 
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E") no-repeat center;
-}
+summary::after { content: ''; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='12' y1='5' x2='12' y2='19'%3E%3C/line%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E") no-repeat center; }
+details[open] summary::after { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='5' y1='12' x2='19' y2='12'%3E%3C/line%3E%3C/svg%3E") no-repeat center; }
 details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height: 1.6; }
 
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
@@ -698,31 +698,43 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </div>
 
 <script>
-/* === CONTENT GENERATION === */
+/* === CONTENT GENERATION (UPDATED FAQ) === */
 window.addEventListener("DOMContentLoaded", () => {
-  // FAQ
+  // FAQ DATA
   const faqData = [
     { q: "За сколько бронировать дату?", a: "Обычно за 1–2 недели; популярные даты — за месяц и раньше." },
-    { q: "Какой размер задатка?", a: "50 % от согласованной суммы. Остальное — в день мероприятия." },
-    { q: "Всё ли входит в стоимость?", a: "Да, цена «под ключ» без скрытых платежей." },
     { q: "Сколько длится программа?", a: "Частные шоу — 20–40 мин, микромагия — до 3 ч, концерт — 1–2 ч." },
+    { q: "Какой размер задатка?", a: "50 % от согласованной суммы. Остальное — в день мероприятия." },
+    { q: "Выезжаете в другие регионы?", a: "Да, работаю в нескольких областях и выезжаю по стране." },
     { q: "Можно персонализировать трюк?", a: "Да! Подготовим номер под вашего именинника/бренд/событие." },
     { q: "Нужна ли сцена?", a: "Чаще нет. Для больших залов и концертной программы — по согласованию." },
-    { q: "Что по звуку и аппаратуре?", a: "С ведущим — всё готово. Без ведущего нужна активная колонка/микрофон. Для концерта — технический райдер." },
+    // Hidden Questions
+    { q: "Что по звуку и аппаратуре?", a: "С ведущим — всё готово. Без ведущего нужна активная колонка/микрофон." },
     { q: "Сколько занимает подготовка?", a: "Около 30 мин; для концертной программы — до 1 ч." },
-    { q: "Выезжаете в другие регионы?", a: "Да, работаю в нескольких областях и выезжаю по стране." },
     { q: "Способы оплаты?", a: "Безнал, СБП, наличные. Предусмотрен договор и чек." },
-    { q: "Какой возраст для детских шоу?", a: "Для детей 8+; для младших — по согласованию и с адаптацией интерактива." },
+    { q: "Какой возраст для детских шоу?", a: "Для детей 8+; для младших — по согласованию." },
     { q: "Можно снимать фото/видео?", a: "Да, съёмка приветствуется." },
-    { q: "Есть ли официальное оформление?", a: "Да, работаю по договору, предоставляю кассовый чек." },
-    { q: "Возможна площадка под открытым небом?", a: "Летом при безветренной погоде, с резервным планом на дождь." },
+    { q: "Есть ли официальное оформление?", a: "Да, работаю по договору (ИП, Самозанятость)." },
+    { q: "Возможна площадка под открытым небом?", a: "Летом при безветренной погоде." },
     { q: "Безопасны ли спецэффекты?", a: "Используются только сертифицированные и безопасные эффекты." },
-    { q: "Можно ли интегрировать бренд компании?", a: "Да, интегрируем лого и смыслы бренда в интерактив и номера." },
-    { q: "Что если дата переносится?", a: "Перенос возможен при наличии свободного слота; условия фиксируем в договоре." },
-    { q: "Какой формат аудитории подходит?", a: "От камерных вечеринок 10–20 гостей до залов на 500+ человек." },
-    { q: "Проводите мастер-классы?", a: "Да: 60 мин обучения + реквизит, участники показывают фокус сразу." }
+    { q: "Можно ли интегрировать бренд?", a: "Да, интегрируем лого и смыслы бренда в интерактив." },
+    { q: "Что если дата переносится?", a: "Перенос возможен при наличии свободного слота." },
+    { q: "Какой формат аудитории?", a: "От 10 до 500+ человек." },
+    { q: "Проводите мастер-классы?", a: "Да: 60 мин обучения + реквизит в подарок." }
   ];
-  document.getElementById('faqContainer').innerHTML = faqData.map(f => `<details><summary>${f.q}</summary><div>${f.a}</div></details>`).join('');
+
+  const container = document.getElementById('faqContainer');
+  const VISIBLE_COUNT = 6;
+
+  let html = faqData.map((f, i) => {
+    const isHidden = i >= VISIBLE_COUNT ? 'hidden' : '';
+    return `<details class="faq-item ${isHidden}"><summary>${f.q}</summary><div>${f.a}</div></details>`;
+  }).join('');
+
+  if (faqData.length > VISIBLE_COUNT) {
+    html += `<div class="faq-controls"><button class="btn btn-glass" onclick="showAllFaq(this)">Показать все вопросы (${faqData.length}) <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>`;
+  }
+  container.innerHTML = html;
 
   // Gallery
   const galGrid = document.getElementById('galGrid');
@@ -739,35 +751,15 @@ window.addEventListener("DOMContentLoaded", () => {
   initHeroParticles();
   updateServices();
   
-  // CURTAIN ANIMATION SEQUENCE
+  // Animations
   document.body.style.opacity = 1; document.body.style.visibility = "visible";
-  
   const tl = gsap.timeline();
-  
-  // 1. Text Appears
   tl.to(".curtain-text", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" })
     .to(".curtain-subtext", { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }, "-=1")
-    
-  // 2. Open Curtains
     .to(".curtain-panel.left", { xPercent: -100, duration: 3, ease: "power2.inOut" }, "+=0.5")
     .to(".curtain-panel.right", { xPercent: 100, duration: 3, ease: "power2.inOut" }, "<")
     .to(".curtain-content", { opacity: 0, scale: 1.2, duration: 1.5, ease: "power2.in" }, "<")
-    
-  // 3. MAGIC PARTICLES
-    .to({}, { 
-        duration: 3, 
-        onUpdate: function() {
-            if(heroParticlesMaterial) {
-                gsap.to(heroParticlesMaterial.uniforms.uProgress, {
-                    value: 1, 
-                    duration: 4, 
-                    ease: "power2.out" 
-                });
-            }
-        } 
-    }, "-=2.5")
-
-  // 4. Hero Content Animations
+    .to({}, { duration: 3, onUpdate: function() { if(heroParticlesMaterial) { gsap.to(heroParticlesMaterial.uniforms.uProgress, { value: 1, duration: 4, ease: "power2.out" }); } } }, "-=2.5")
     .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.5")
     .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.8")
     .from(".hero-btns", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
@@ -781,6 +773,16 @@ window.addEventListener("DOMContentLoaded", () => {
     gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 80%" }, y: 40, opacity: 0, duration: 1, ease: "power3.out" });
   });
 });
+
+// FAQ LOGIC
+window.showAllFaq = function(btn) {
+  const hiddenItems = document.querySelectorAll('.faq-item.hidden');
+  hiddenItems.forEach(item => {
+    item.classList.remove('hidden');
+    item.classList.add('fade-in');
+  });
+  btn.style.display = 'none';
+}
 
 /* === STORY VIEWER LOGIC === */
 function openReview(el) {
