@@ -18,6 +18,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
+<script>
+    if (history.scrollRestoration) {
+        history.scrollRestoration = 'manual';
+    }
+    window.onbeforeunload = function () {
+        window.scrollTo(0, 0);
+    }
+</script>
+
 <style>
 :root {
   --bg: #050505;
@@ -41,7 +50,7 @@ body {
   font-family: var(--ff-body); background: var(--bg); color: var(--text);
   line-height: 1.6; overflow-x: hidden; position: relative;
   opacity: 1; visibility: visible;
-  height: 100vh; overflow-y: hidden; 
+  height: 100vh; overflow-y: hidden; /* Блок скролла на старте */
 }
 body.loaded { overflow-y: auto; height: auto; }
 
@@ -64,11 +73,15 @@ body.loaded { overflow-y: auto; height: auto; }
   position: fixed; inset: 0; z-index: 10000;
   display: flex; pointer-events: none;
   background: transparent;
+  transition: opacity 1s ease, visibility 1s ease;
 }
+.curtain-wrapper.finished { opacity: 0; visibility: hidden; }
+
 .curtain-bg {
     position: absolute; inset: 0; background: #000; z-index: 1;
     transition: opacity 1s ease;
 }
+
 .curtain-spotlight {
   position: absolute; inset: 0; z-index: 5;
   background: radial-gradient(circle at 50% 40%, transparent 10%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%);
@@ -180,7 +193,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .nav-card span { text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.2em; font-weight: 700; display:block; opacity: 0.8; }
 
 /* === HERO === */
-.hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
+.hero { height: 100dvh; display: flex; align-items: flex-end; padding-bottom: 120px; position: relative; overflow: hidden; }
 .hero-img {
   position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
   background-image: url('images/hero-portrait.png'); 
@@ -188,14 +201,17 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
   pointer-events: none; z-index: 1;
 }
 #hero-particles-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2; }
-@media (max-width: 768px) { .hero-img { width: 100%; height: 100%; background-size: cover; background-position: center 20%; } }
+@media (max-width: 768px) { 
+    .hero { padding-bottom: 80px; }
+    .hero-img { width: 100%; height: 100%; background-size: cover; background-position: center top; } 
+}
 
-.hero-content { max-width: 700px; position: relative; z-index: 3; }
+.hero-content { max-width: 700px; position: relative; z-index: 3; margin-bottom: 20px; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
-.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; opacity: 0; transform: translateY(20px); }
-.hero-btns { display:flex; gap:20px; flex-wrap:wrap; opacity:0; transform:translateY(20px); }
+.hero-desc { font-size: 1.1rem; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); margin-bottom: 40px; max-width: 480px; }
+.hero-btns { display:flex; gap:20px; flex-wrap:wrap; }
 
-/* === PARTNERS MARQUEE === */
+/* === PARTNERS MARQUEE (FIXED) === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
@@ -301,7 +317,6 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 /* === REVIEWS (TELEGRAM STYLE) & FAQ === */
 .reviews-grid { 
   display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; 
-  /* COMPACT VIEW FOR REVIEWS TO PREVENT STRETCHING */
   max-width: 850px; margin: 0 auto;
 }
 .tg-review-item { display: flex; flex-direction: column; align-items: center; width: 200px; }
@@ -310,7 +325,6 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
   border: 3px solid var(--gold-primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   position: relative; cursor: pointer; transition: transform 0.3s ease, border-color 0.3s;
   background: #000; margin-bottom: 15px;
-  /* PREVENT OVAL SHAPE */
   flex-shrink: 0;
 }
 .tg-circle:hover { transform: scale(1.05); border-color: #fff; }
@@ -327,10 +341,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 }
 .story-viewer.active { opacity: 1; pointer-events: all; }
 .story-content {
-  position: relative; 
-  /* PHONE SIZE LIMITS TO PREVENT GIANT VIDEO ON DESKTOP */
-  max-width: 420px; width: 90vw;
-  max-height: 90vh; aspect-ratio: 9/16;
+  position: relative; max-width: 420px; width: 90vw; max-height: 90vh; aspect-ratio: 9/16;
   border-radius: 20px; overflow: hidden; box-shadow: 0 20px 80px rgba(0,0,0,0.8);
   border: 1px solid #333; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -380,6 +391,20 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .school-modal-content p { color: #ccc; text-align: center; margin-bottom: 20px; font-size: 0.95rem; }
 .school-features { display: grid; gap: 15px; margin-bottom: 25px; }
 .school-feat { display: flex; align-items: center; gap: 10px; color: #e9ecf4; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+
+/* Video Widget */
+.video-widget {
+  position: fixed; bottom: 80px; right: 20px; width: 100px; height: 160px;
+  border-radius: 16px; overflow: hidden; z-index: 900; cursor: pointer;
+  border: 2px solid var(--gold-primary); transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); background: #000;
+}
+.video-widget:hover { transform: scale(1.05); }
+.video-widget.expanded { width: 300px; height: 520px; bottom: 20px; right: 20px; }
+.video-widget video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vid-badge { position: absolute; top: -5px; left: -5px; background: #c00; color: #fff; font-size: 0.7rem; padding: 4px 8px; border-radius: 10px; font-weight: bold; animation: pulse 2s infinite; z-index: 3; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+@media (max-width: 600px) { .video-widget { bottom: 90px; right: 10px; width: 80px; height: 120px; } .video-widget.expanded { width: 90vw; height: 70vh; bottom: 80px; } }
 
 </style>
 </head>
@@ -436,25 +461,20 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 </div>
 
 <section id="hero" class="hero">
-  <div class="hero-img">
-    <div id="hero-particles-container"></div>
-  </div>
+  <div class="hero-img"></div>
   
   <div class="container">
     <div class="hero-content">
       <h1 class="hero-title">Магия <br><span class="text-gold">Высокого Уровня</span></h1>
       <p class="hero-desc">Премиальное шоу для тех, кто видел всё. Интеллектуально. Стильно. Дорого.</p>
       <div class="hero-btns">
-        <a href="#calc" class="btn btn-primary">
-          <svg class="icon-svg" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-          Рассчитать
-        </a>
+        
         <button class="btn btn-glass" onclick="openVideo()">
           <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
           Смотреть промо
         </button>
+
       </div>
-      
     </div>
   </div>
 </section>
@@ -703,8 +723,6 @@ window.addEventListener("DOMContentLoaded", () => {
     .to(".curtain-content", { opacity: 0, scale: 1.2, duration: 1.5, ease: "power2.in" }, "<")
     // BG Fade out (reveals site)
     .to(".curtain-bg", { opacity: 0, duration: 1 }, "-=2.0")
-    // Magic Particles Start
-    .to({}, { duration: 3, onUpdate: function() { if(heroParticlesMaterial) { gsap.to(heroParticlesMaterial.uniforms.uProgress, { value: 1, duration: 4, ease: "power2.out" }); } } }, "-=2.0")
     // Content Animation
     .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.5")
     .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.8")
@@ -748,17 +766,17 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // Gallery
   const galGrid = document.getElementById('galGrid');
-  for(let i=0; i<6; i++){
+  for(let i=1; i<=6; i++){
     const img = document.createElement('img'); 
-    img.src = `images/gallery/event-0${i+1}.webp`;
-    img.onerror = () => img.src = `https://via.placeholder.com/300x200/111/333?text=Photo+${i+1}`;
+    img.src = `images/${i}.jpg`;
+    img.onerror = () => img.src = `https://via.placeholder.com/300x200/111/333?text=Photo+${i}`;
     img.onclick = () => { document.getElementById('lbImg').src=img.src; document.getElementById('modalImg').classList.add('open'); };
     galGrid.appendChild(img);
   }
 
   // Init Logic
   initThreeJS();
-  initHeroParticles();
+  // Removed particle portrait logic as requested (pure image)
   updateServices();
   initGame();
 
@@ -1035,61 +1053,6 @@ function initGame() {
     deck.appendChild(card);
   }
 }
-
-/* === THREE.JS HERO PARTICLES (FIXED FOR CORS) === */
-let heroParticlesMaterial;
-function initHeroParticles() {
-  const container = document.getElementById('hero-particles-container'); if (!container) return;
-  const scene = new THREE.Scene();
-  const width = container.offsetWidth; const height = container.offsetHeight;
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000); camera.position.z = 100;
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
-  
-  const img = new Image(); 
-  img.crossOrigin = "Anonymous"; // FIX CORS
-  img.src = 'images/hero-portrait.png'; 
-  
-  img.onload = () => {
-    const imageCanvas = document.createElement('canvas'); const ctx = imageCanvas.getContext('2d');
-    const particleDensity = window.innerWidth < 768 ? 6 : 4;
-    const iw = img.width; const ih = img.height;
-    imageCanvas.width = iw; imageCanvas.height = ih;
-    ctx.drawImage(img, 0, 0); const data = ctx.getImageData(0, 0, iw, ih).data;
-    const geometry = new THREE.BufferGeometry();
-    const positions = []; const colors = []; const randoms = [];
-    const ratio = window.innerWidth < 768 ? 0.15 : 0.25; 
-    for (let y = 0; y < ih; y += particleDensity) {
-      for (let x = 0; x < iw; x += particleDensity) {
-        const i = (y * iw + x) * 4;
-        const r = data[i] / 255; const g = data[i + 1] / 255; const b = data[i + 2] / 255; const a = data[i + 3];
-        if (a > 20 && (r+g+b) > 0.1) {
-          const px = (x - iw / 2) * ratio; const py = -(y - ih / 2) * ratio - 10;
-          positions.push(px, py, 0); colors.push(r, g, b);
-          randoms.push((Math.random()-0.5)*400, (Math.random()-0.5)*400, (Math.random()-0.5)*400);
-        }
-      }
-    }
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    geometry.setAttribute('aRandom', new THREE.Float32BufferAttribute(randoms, 3));
-    heroParticlesMaterial = new THREE.ShaderMaterial({
-      vertexShader: `uniform float uTime; uniform float uProgress; attribute vec3 aRandom; varying vec3 vColor; void main() { vColor = color; vec3 pos = mix(aRandom, position, uProgress); pos.x += sin(uTime * 2.0 + position.y) * 0.5 * uProgress; pos.z += cos(uTime * 1.5 + position.x) * 0.5 * uProgress; vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0); gl_PointSize = (3.0 * uProgress + 1.0) * (50.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,
-      fragmentShader: `varying vec3 vColor; void main() { float dist = length(gl_PointCoord - vec2(0.5)); if (dist > 0.5) discard; gl_FragColor = vec4(vColor, 1.0); }`,
-      uniforms: { uTime: { value: 0 }, uProgress: { value: 0 } },
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-    });
-    const particles = new THREE.Points(geometry, heroParticlesMaterial);
-    if(window.innerWidth > 768) particles.position.x = 25; else particles.position.y = 10;
-    scene.add(particles);
-    const clock = new THREE.Clock();
-    function animate() { requestAnimationFrame(animate); const time = clock.getElapsedTime(); heroParticlesMaterial.uniforms.uTime.value = time; renderer.render(scene, camera); }
-    animate();
-  };
-  window.addEventListener('resize', () => { const w = container.offsetWidth; const h = container.offsetHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); });
-}
-initHeroParticles();
 
 /* === BACKGROUND PARTICLES (Original) === */
 const initThreeJS = () => {
