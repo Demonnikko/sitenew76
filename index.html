@@ -40,7 +40,7 @@ html { -webkit-font-smoothing: antialiased; cursor: none; }
 body {
   font-family: var(--ff-body); background: var(--bg); color: var(--text);
   line-height: 1.6; overflow-x: hidden; position: relative;
-  opacity: 0; visibility: hidden;
+  opacity: 1; visibility: visible; /* Force visible */
 }
 
 /* 3D BACKGROUND CANVAS */
@@ -62,7 +62,10 @@ body {
   position: fixed; inset: 0; z-index: 10000;
   display: flex; pointer-events: none;
   background: #000;
+  transition: transform 1.5s ease-in-out; /* CSS Fallback Animation */
 }
+.curtain-wrapper.hidden { transform: translateY(-100%); }
+
 .curtain-spotlight {
   position: absolute; inset: 0; z-index: 5;
   background: radial-gradient(circle at 50% 40%, transparent 10%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%);
@@ -71,11 +74,10 @@ body {
 .curtain-panel {
   width: 50%; height: 100%;
   position: relative; z-index: 2;
-  background-color: #4a0404; /* Royal Red */
+  background-color: #4a0404;
   background-image: repeating-linear-gradient(90deg, 
       rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(255,50,50,0.1) 25%, rgba(80,0,0,0.5) 35%, rgba(0,0,0,0.8) 50%
   );
-  filter: url(#velvet-noise) contrast(1.1) brightness(0.9);
   box-shadow: inset 0 0 150px rgba(0,0,0,1);
   transform-origin: top; will-change: transform;
 }
@@ -90,7 +92,7 @@ body {
 .curtain-content {
   position: absolute; top: 45%; left: 50%;
   transform: translate(-50%, -50%); z-index: 10;
-  text-align: center; width: 100%; perspective: 1000px;
+  text-align: center; width: 100%;
 }
 .curtain-text {
   font-family: var(--ff-head); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; 
@@ -99,12 +101,11 @@ body {
   -webkit-background-clip: text; background-clip: text;
   filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5)) drop-shadow(0 2px 0 #000);
   letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0; transform: scale(0.9);
 }
 .curtain-subtext {
   font-family: var(--ff-body); font-size: 0.9rem; 
   color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.3em;
-  margin-top: 10px; opacity: 0;
+  margin-top: 10px; 
 }
 
 /* === UI UTILS === */
@@ -177,7 +178,9 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .hero { height: 100dvh; display: flex; align-items: center; position: relative; overflow: hidden; }
 .hero-img {
   position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
-  background-image: url('images/hero-portrait.png'); background-size: contain; background-repeat: no-repeat; background-position: bottom center;
+  /* FALLBACK IMAGE */
+  background-image: url('images/hero-portrait.png'); 
+  background-size: contain; background-repeat: no-repeat; background-position: bottom center;
   pointer-events: none; z-index: 1;
 }
 #hero-particles-container { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2; }
@@ -185,13 +188,13 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 
 .hero-content { max-width: 700px; position: relative; z-index: 2; }
 .hero-title { font-family: var(--ff-head); font-size: clamp(40px, 9vw, 96px); line-height: 1.05; margin-bottom: 24px; }
-.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; opacity: 0; transform: translateY(20px); }
-.hero-btns { opacity: 0; transform: translateY(20px); display:flex; gap:20px; flex-wrap:wrap; }
-.hero-stats { margin-top: 50px; display: flex; gap: 40px; opacity: 0; }
+.hero-desc { font-size: 1.1rem; color: #aaa; margin-bottom: 40px; max-width: 480px; }
+.hero-btns { display:flex; gap:20px; flex-wrap:wrap; }
+.hero-stats { margin-top: 50px; display: flex; gap: 40px; }
 .stat h4 { font-size: 2rem; font-family: var(--ff-head); margin: 0; color: #fff; }
 .stat p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* === PARTNERS MARQUEE (FIXED) === */
+/* === PARTNERS MARQUEE === */
 .partners-section { 
   padding: 40px 0; border-bottom: 1px solid #222; overflow: hidden; 
   background: rgba(8,8,8,0.5); backdrop-filter: blur(5px); position:relative; z-index:2; 
