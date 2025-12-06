@@ -2,176 +2,28 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ABRACADABRA — Школа фокусов Дмитрия Костюка</title>
-  <meta name="description" content="Школа фокусов для детей 7–13 лет. Уверенность, харизма и умение управлять вниманием.">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Школа Фокусов | Kostyuk Project</title>
+  <meta name="description" content="Школа фокусов для детей 7–13 лет.">
   <meta name="theme-color" content="#050505"/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
-
-  <style>
-    /* === НАСТРОЙКИ ДИЗАЙНА (Синхронизация с Kostyuk Project) === */
-    :root{
-      --black: #050505; 
-      --navy: #0B1426; 
-      --panel: rgba(20, 20, 22, 0.6);
-      /* Ваше фирменное золото */
-      --gold: #D4AF37; 
-      --gold-dark: #8A6E2F;
-      --ivory: #F2F2F2;
-      --muted: #9EA6B8; 
-      --glow: rgba(212, 175, 55, 0.15);
-      --radius: 20px; 
-      --maxw: 1120px; 
-      --field-h: 56px;
-      
-      --ff-head: 'Cormorant Garamond', serif; /* Шрифт школы */
-      --ff-brand: 'Cinzel', serif; /* Шрифт бренда */
-      --ff-body: 'Manrope', sans-serif; /* Шрифт текста */
-    }
-
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth; overflow-x:hidden}
-    body{
-      margin:0;
-      /* Темный фон в стиле основного сайта, но с магическим оттенком */
-      background: radial-gradient(80vw 80vw at 50% -10%, #1a1a00, transparent),
-                  radial-gradient(60vw 60vw at -10% 20%, #050505, transparent),
-                  var(--black);
-      color: var(--ivory);
-      font-family: var(--ff-body);
-      -webkit-font-smoothing:antialiased;
-    }
-    
-    a{color:inherit; text-decoration:none}
-    h1,h2,h3{font-family: var(--ff-head); line-height:1.1; margin:0 0 .6em}
-    p{margin:0 0 1em; line-height:1.6}
-    .container{max-width:var(--maxw); margin:0 auto; padding:0 20px}
-    .center{text-align:center}
-    section{padding:80px 0}
-    
-    /* === HEADER === */
-    .topbar{
-        position:sticky; top:0; z-index:30; 
-        backdrop-filter: blur(12px);
-        background: rgba(5,5,5,0.9); 
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .topbar__row{display:flex; align-items:center; justify-content:space-between; height:70px}
-    
-    /* Логотип текстом или картинкой */
-    .brand { font-family: var(--ff-brand); font-weight: 700; color: #fff; font-size: 1.2rem; }
-    .brand span { color: var(--gold); margin-left: 5px; }
-
-    /* Кнопка "Назад" */
-    .back-btn {
-        display: flex; align-items: center; gap: 8px;
-        color: #fff; font-size: 0.9rem; font-weight: 600;
-        border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 50px;
-        transition: 0.3s; cursor: pointer;
-    }
-    .back-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-    /* === HERO === */
-    .hero{padding:100px 0 60px; text-align:center}
-    .hero h1{font-size: clamp(36px, 6.5vw, 72px); color:var(--ivory); margin-bottom: 20px;}
-    .subtitle{font-size: clamp(16px, 1.2rem, 22px); color:#cfd6e6; max-width:700px; margin:0 auto 40px;}
-    
-    .cta-row{display:flex; gap:15px; justify-content:center; flex-wrap:wrap}
-    
-    .btn{
-        appearance:none; border:none; cursor:pointer; font-weight:800; text-align:center;
-        padding:18px 32px; border-radius:50px; transition:0.3s; 
-        font-family: var(--ff-body); text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.9rem;
-    }
-    .btn-primary{
-        background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
-        color: #000; 
-        box-shadow: 0 10px 30px rgba(212,175,55,0.2);
-    }
-    .btn-primary:hover{ transform:translateY(-3px); box-shadow: 0 15px 40px rgba(212,175,55,0.4); }
-    
-    .btn-ghost{
-        background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.2);
-    }
-    .btn-ghost:hover{ border-color: var(--gold); background: rgba(255,255,255,0.1); }
-
-    .hero-badges{margin-top:30px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; color:#aeb6c9; font-size:0.9rem}
-    .hero-badges span{display:inline-flex; gap:8px; align-items:center; padding:8px 16px; border:1px solid rgba(255,255,255,0.1); border-radius:50px; background:rgba(255,255,255,0.02);}
-
-    /* === MENTOR SECTION (НОВЫЙ БЛОК ПРО ВАС) === */
-    .mentor-section { background: rgba(255,255,255,0.02); border-top: 1px solid #222; border-bottom: 1px solid #222; }
-    .mentor-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; align-items: center; }
-    
-    .mentor-visual { position: relative; }
-    .mentor-img { 
-        width: 100%; aspect-ratio: 4/5; object-fit: cover; border-radius: 20px; 
-        border: 1px solid rgba(255,255,255,0.1); filter: grayscale(20%);
-    }
-    
-    .mentor-content h2 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; color: #fff; }
-    .mentor-content h2 span { color: var(--gold); }
-    .mentor-text { font-size: 1.1rem; color: #ccc; margin-bottom: 30px; }
-    
-    .achievements { display: flex; gap: 40px; margin-bottom: 30px; }
-    .achievements div h4 { font-family: var(--ff-brand); font-size: 2rem; margin: 0; color: var(--gold); }
-    .achievements div p { margin: 0; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 0.1em; }
-
-    @media (max-width: 900px) { .mentor-grid { grid-template-columns: 1fr; } .mentor-img { max-width: 400px; margin: 0 auto; } .mentor-content { text-align: center; } .achievements { justify-content: center; } }
-
-    /* === CARDS === */
-    .features{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px}
-    .card{
-        background: var(--panel); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:30px;
-        transition:0.3s;
-    }
-    .card:hover{transform:translateY(-5px); border-color:var(--gold); box-shadow:0 10px 40px rgba(0,0,0,0.5);}
-    .card h3{font-size:1.8rem; color:var(--gold); margin-bottom:15px}
-    .card p{color:#ccc; font-size: 1rem;}
-
-    /* === PRICING === */
-    .pricing-grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px}
-    .price{
-      background: var(--panel); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius); padding:30px;
-      display: flex; flex-direction: column; position: relative;
-    }
-    .price.hot { border-color: var(--gold); box-shadow: 0 0 30px rgba(212,175,55,0.05); }
-    .price h3{font-size:2rem; color:var(--ivory); text-align:center}
-
-    .badge{ position: absolute; top: 20px; right: 20px; padding:5px 12px; background:var(--gold); color:#000; border-radius:50px; font-weight:800; font-size:0.8rem; text-transform: uppercase;}
-    
-    .amount{text-align: center; margin: 20px 0;}
-    .amount .new{font-size:3rem; color:var(--gold); font-weight:800; font-family: var(--ff-brand);}
-    .amount .old{font-size:1.2rem; color:#666; text-decoration:line-through}
-
-    .bullets{list-style:none; padding:0; margin:0 0 30px 0; color:#ccc}
-    .bullets li { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-    .bullets li::before { content: '✓'; color: var(--gold); font-weight: bold; }
-
-    /* === FORM === */
-    .form-section { background: rgba(255,255,255,0.02); }
-    .form{background:var(--panel); border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius); padding:40px; max-width:600px; margin:0 auto;}
-    .input{
-        width:100%; height:60px; padding:20px; border-radius:12px; 
-        border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); 
-        color:#fff; font-size:1rem; outline:none; margin-bottom: 15px;
-        transition: 0.3s;
-    }
-    .input:focus{border-color:var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.1);}
-    
-    .consent{margin:15px 0 0; font-size:0.8rem; color:#666; text-align:center}
-
-    /* === FOOTER === */
-    footer{ border-top:1px solid rgba(255,255,255,0.1); padding:40px 0; margin-top:60px; text-align: center; color: #666; font-size: 0.9rem; }
-  </style>
+  <link rel="stylesheet" href="style.css">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
-<body>
+<body class="page-school">
 
-  <header class="topbar">
-    <div class="container topbar__row">
-      <a href="index.html" class="brand">KOSTYUK <span>PROJECT</span></a>
+  <div class="preloader" id="preloader">
+    <div class="preloader-text">ШКОЛА МАГИИ</div>
+  </div>
+
+  <header class="header">
+    <div class="container nav-flex">
+      <a href="index.html" class="logo">KOSTYUK <span>PROJECT</span></a>
       <a href="index.html" class="back-btn">
          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
          Меню
@@ -179,20 +31,20 @@
     </div>
   </header>
 
-  <section class="hero">
+  <section class="school-hero">
     <div class="container">
-      <span style="color:var(--gold); text-transform:uppercase; letter-spacing:0.2em; font-size:0.8rem;">Академия Волшебства</span>
-      <h1>Школа фокусов <br>для детей 7–13 лет</h1>
-      <p class="subtitle">Мы не просто учим трюкам. Мы превращаем застенчивость в уверенность, а робкие слова — в аплодисменты зала.</p>
+      <span class="hero-label">Академия Волшебства</span>
+      <h1 class="hero-title">Школа фокусов <br>для детей 7–13 лет</h1>
+      <p class="subtitle">Уверенность, харизма и умение управлять вниманием.</p>
       <div class="cta-row">
         <a href="#signup" class="btn btn-primary">Записаться на пробный</a>
-        <a href="#program" class="btn btn-ghost">Программа</a>
       </div>
-
-      <div class="hero-badges">
-        <span>👥 Группы до 10 человек</span>
-        <span>🎙️ Сцена и речь</span>
-        <span>📔 AR-дневник</span>
+      
+      <div class="deadline">
+        <span style="color:#666; font-size:0.8rem;">Осталось 7 мест</span>
+        <div class="timer-box" style="font-family:'Cinzel'; font-size:1.5rem; color:var(--gold-primary);">
+           <span id="d">03</span>:<span id="h">00</span>:<span id="m">00</span>
+        </div>
       </div>
     </div>
   </section>
@@ -200,152 +52,85 @@
   <section class="mentor-section">
     <div class="container">
       <div class="mentor-grid">
-        <div class="mentor-visual">
-           <img src="images/hero-portrait.png" class="mentor-img" alt="Дмитрий Костюк">
+        <div class="mentor-visual gs-reveal">
+           <img src="images/hero-portrait.png" class="mentor-img" alt="Дмитрий Костюк" onclick="openVideo()">
+           <div class="play-btn-center" onclick="openVideo()"><svg viewBox="0 0 24 24" fill="#000"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
         </div>
-        <div class="mentor-content">
-           <span style="color:#888; text-transform:uppercase; letter-spacing:0.1em; font-size:0.8rem;">Ваш наставник</span>
-           <h2>ДМИТРИЙ <span>КОСТЮК</span></h2>
-           <p class="mentor-text">
-             Профессиональный иллюзионист, участник ТВ-шоу и создатель театральных постановок.
-             Я создал эту школу, чтобы передать детям не просто секреты фокусов, а умение быть Артистом в жизни.
-           </p>
-           
+        <div class="mentor-content gs-reveal">
+           <span style="color:#666; text-transform:uppercase; letter-spacing:0.1em; font-size:0.8rem;">Ваш наставник</span>
+           <h2>ДМИТРИЙ <span class="text-gold">КОСТЮК</span></h2>
+           <p class="mentor-text">Профессиональный иллюзионист, участник ТВ-шоу. Я создал эту школу, чтобы передать детям умение быть Артистом в жизни.</p>
            <div class="achievements">
               <div><h4>7+</h4><p>Лет опыта</p></div>
               <div><h4>1.8k</h4><p>Шоу</p></div>
               <div><h4>TV</h4><p>Проекты</p></div>
            </div>
-
-           <p style="font-style:italic; border-left:2px solid var(--gold); padding-left:15px; color:#aaa;">
-             "Магия — это лучший инструмент для развития харизмы."
-           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="why">
+  <section id="why" class="section-py">
     <div class="container">
-      <h2 class="center" style="color:var(--ivory); margin-bottom:40px;">Почему не футбол и не музыка?</h2>
-      <div class="features">
-        <div class="card"><h3>🧠 Харизма</h3><p>Навык держать паузу, говорить уверенно и управлять вниманием ценится сильнее, чем сотня подтягиваний.</p></div>
-        <div class="card"><h3>🎤 Сцена</h3><p>Каждый урок — мини-выступление. Ребёнок получает реакцию зала и перестаёт бояться публики.</p></div>
-        <div class="card"><h3>✨ Суперсила</h3><p>Умение удивлять — это социальный лифт. В любой компании ваш ребенок будет в центре внимания.</p></div>
-        <div class="card"><h3>🎯 Геймификация</h3><p>Очки, ачивки, наклейки и «шкала побед» — ребёнок сам бежит на занятия.</p></div>
+      <h2 class="text-center gs-reveal" style="margin-bottom:40px;">Почему не футбол?</h2>
+      <div class="grid-cards">
+        <div class="card gs-reveal"><h3>🧠 Харизма</h3><p>Навык держать паузу и говорить уверенно.</p></div>
+        <div class="card gs-reveal"><h3>🎤 Сцена</h3><p>Каждый урок — мини-выступление. Прощай, страх сцены.</p></div>
+        <div class="card gs-reveal"><h3>✨ Суперсила</h3><p>В любой компании ваш ребенок будет в центре внимания.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="price">
+  <section id="price" class="section-py">
     <div class="container">
-      <h2 class="center" style="color:var(--ivory); margin-bottom:50px;">Стоимость обучения</h2>
+      <h2 class="text-center gs-reveal" style="margin-bottom:50px;">Стоимость</h2>
       <div class="pricing-grid">
-
-        <div class="price">
+        <div class="price gs-reveal">
           <h3>Месяц</h3>
-          <div class="amount">
-            <div class="old">3 990 ₽</div>
-            <div class="new">2 990 ₽</div>
-          </div>
-          <ul class="bullets">
-             <li>4 занятия по 2 часа</li>
-             <li>Дневник волшебника</li>
-             <li>Реквизит в подарок</li>
-             <li>Отчетный концерт</li>
-          </ul>
+          <div class="amount"><div class="old">3 990 ₽</div><div class="new">2 990 ₽</div></div>
+          <ul class="bullets"><li>4 занятия</li><li>Реквизит</li><li>Концерт</li></ul>
           <div class="center"><a href="#signup" class="btn btn-primary" style="width:100%">Выбрать</a></div>
         </div>
-
-        <div class="price hot">
-          <div class="badge">ВЫГОДНО</div>
+        <div class="price hot gs-reveal">
+          <div class="badge">ХИТ</div>
           <h3>Полгода</h3>
-          <div class="amount">
-            <div class="old">18 690 ₽</div>
-            <div class="new">14 950 ₽</div>
-          </div>
-          <p style="color:#aaa; text-align:center; font-size:0.9rem; margin-top:-15px; margin-bottom:20px;">Экономия 3 740 ₽</p>
-          <ul class="bullets">
-             <li>Все преимущества</li>
-             <li>Фиксация цены</li>
-             <li>Приоритет в группе</li>
-             <li>VIP реквизит</li>
-          </ul>
+          <div class="amount"><div class="old">18 690 ₽</div><div class="new">14 950 ₽</div></div>
+          <ul class="bullets"><li>Всё включено</li><li>Фиксация цены</li><li>VIP реквизит</li></ul>
           <div class="center"><a href="#signup" class="btn btn-primary" style="width:100%">Выбрать</a></div>
         </div>
-
       </div>
     </div>
   </section>
 
-  <section id="signup" class="form-section">
-    <div class="container">
-      <h2 class="center" style="color:var(--ivory); margin-bottom:10px;">Запишитесь на пробный урок</h2>
-      <p class="center" style="color:#888; margin-bottom:30px;">Это бесплатно и ни к чему не обязывает.</p>
-      
+  <section id="signup" class="section-py" style="background: rgba(255,255,255,0.02);">
+    <div class="container gs-reveal">
+      <h2 class="center">Запишитесь на пробный урок</h2>
       <form class="form" id="schoolForm">
-        <input class="input" name="parent" placeholder="Имя родителя" required>
-        <input class="input" name="phone" type="tel" placeholder="Телефон" required>
-        <input class="input" name="age" type="number" placeholder="Возраст ребёнка" required>
-        
-        <input type="text" name="website" style="display:none;">
-
-        <div class="center">
-          <button class="btn btn-primary" style="width:100%">Отправить заявку</button>
-        </div>
-        <p class="consent">Нажимая кнопку, вы соглашаетесь с обработкой данных.</p>
+        <input class="input-field" name="parent" placeholder="Имя родителя" required>
+        <input class="input-field" name="phone" type="tel" placeholder="Телефон" required>
+        <input class="input-field" name="age" type="number" placeholder="Возраст ребёнка" required>
+        <div class="center"><button class="btn btn-primary" style="width:100%">Отправить заявку</button></div>
       </form>
     </div>
   </section>
 
-  <footer>
-    <div class="container">
-      <p>© 2025 Школа «Абракадабра» | Kostyuk Project</p>
+  <footer style="text-align:center; padding:40px 0; color:#444; font-size:0.8rem;">© 2025 Школа «Абракадабра»</footer>
+
+  <div id="thanksModal" class="modal">
+    <div class="school-modal-content" style="text-align:center;">
+      <h3 style="color:var(--gold-primary);">Заявка принята!</h3>
+      <p>Мы свяжемся с вами в ближайшее время.</p>
+      <button class="btn btn-glass" onclick="document.getElementById('thanksModal').classList.remove('open')">Закрыть</button>
     </div>
-  </footer>
+  </div>
 
-  <script>
-    // TELEGRAM SENDING LOGIC
-    const TG_TOKEN = "7838972787:AAHaLNVe6xqEnzE5qy5Uh2TwSb66LWYIUhI";
-    const CHAT_ID = 'ВСТАВЬ_СЮДА_ЦИФРЫ_CHAT_ID'; 
+  <div class="modal" id="modalVideo">
+    <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000">
+      <button class="close-btn" onclick="closeVideo()">×</button>
+      <div id="vidContainer"></div>
+    </div>
+  </div>
 
-    document.getElementById('schoolForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button');
-        const oldText = btn.innerText;
-        
-        if(CHAT_ID.includes('CHAT_ID')) { alert('Вставь CHAT_ID в код!'); return; }
-
-        btn.innerText = 'Отправка...'; btn.disabled = true;
-        
-        const fData = new FormData(e.target);
-        // Защита от ботов
-        if(fData.get('website')) return; 
-
-        const text = `🎓 *Заявка в ШКОЛУ*\n\n👤 Родитель: ${fData.get('parent')}\n📱 Тел: ${fData.get('phone')}\n👶 Возраст: ${fData.get('age')}`;
-        
-        try {
-            await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
-            });
-            btn.innerText = 'Успешно!'; 
-            btn.style.background = '#28a745';
-            e.target.reset();
-            setTimeout(() => { btn.innerText = oldText; btn.disabled = false; btn.style.background = ''; }, 3000);
-        } catch (err) {
-            alert('Ошибка отправки. Попробуйте позже.');
-            btn.innerText = oldText; btn.disabled = false;
-        }
-    });
-
-    /* Маска телефона (простая) */
-    document.querySelector('input[name="phone"]').addEventListener('input', (e) => {
-      let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
-      if (!x[2] && x[1] !== '') { e.target.value = '+7 (' + x[1]; }
-      else { e.target.value = !x[2] ? x[1] : '+7 (' + x[2] + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : ''); }
-    });
-  </script>
-
+  <script src="script.js"></script>
 </body>
 </html>
