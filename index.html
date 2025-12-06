@@ -4,34 +4,21 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Kostyuk Project | Premium Magic</title>
-
 <meta name="description" content="Премиальное шоу иллюзиониста Дмитрия Костюка.">
-<meta property="og:title" content="Kostyuk Project">
-<meta property="og:image" content="images/hero-portrait.png">
 <meta name="theme-color" content="#050505">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 </head>
-<body>
+<body class="page-home">
 
 <div class="magic-cursor"></div>
-
-<svg style="display: none;">
-  <filter id="velvet-noise">
-    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
-    <feColorMatrix type="saturate" values="0" />
-    <feComponentTransfer><feFuncA type="linear" slope="0.4" /></feComponentTransfer>
-    <feBlend mode="multiply" in2="SourceGraphic" />
-  </filter>
-</svg>
 
 <div class="curtain-wrapper">
   <div class="curtain-bg"></div>
@@ -48,23 +35,23 @@
 
 <header class="header">
   <div class="container nav-flex">
-    <a href="#" class="logo">KOSTYUK <span>PROJECT</span></a>
+    <a href="index.html" class="logo">KOSTYUK <span>PROJECT</span></a>
     <button class="burger" onclick="toggleMenu()">
-      <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
   </div>
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="afisha.html" class="nav-card gold" onclick="toggleMenu()">
-    <span>Корпоративы и Праздники</span>
+  <a href="afisha.html" class="nav-card gold">
+    <span>Билеты и Афиша</span>
     <h3>КОНЦЕРТНЫЕ ШОУ</h3>
   </a>
   <div style="height: 20px;"></div>
-  <button class="nav-card silver" onclick="openSchoolModal()">
+  <a href="school.html" class="nav-card silver">
     <span>Обучение с нуля</span>
     <h3>ШКОЛА ФОКУСОВ</h3>
-  </button>
+  </a>
 </div>
 
 <section id="hero" class="hero">
@@ -87,33 +74,49 @@
   <div class="container" style="overflow:hidden;">
     <p class="text-center" style="color:#666; font-size:0.75rem; margin-bottom:20px; letter-spacing:0.1em; text-transform:uppercase;">Нам доверяют</p>
     <div class="partners-track">
-      <img src="images/logo-gazprom.png" class="partner-logo" alt="Газпром">
-      <img src="images/logo-chery.png" class="partner-logo" alt="Chery">
-      <img src="images/logo-magnit.png" class="partner-logo" alt="Магнит">
-      <img src="images/logo-rostelecom.png" class="partner-logo" alt="Ростелеком">
-      <img src="images/logo-yaroslavl.png" class="partner-logo" alt="Ярославль">
-      <img src="images/logo-dixy.png" class="partner-logo" alt="Дикси">
-      <img src="images/logo-beeline.png" class="partner-logo" alt="Билайн">
-      <img src="images/logo-perekrestok.png" class="partner-logo" alt="Перекресток">
-      <img src="images/logo-megafon.png" class="partner-logo" alt="Мегафон">
-      <img src="images/logo-danone.png" class="partner-logo" alt="Danone">
-      <img src="images/logo-gazprom.png" class="partner-logo" alt="Газпром">
-      <img src="images/logo-chery.png" class="partner-logo" alt="Chery">
-      <img src="images/logo-magnit.png" class="partner-logo" alt="Магнит">
-      <img src="images/logo-rostelecom.png" class="partner-logo" alt="Ростелеком">
-      <img src="images/logo-yaroslavl.png" class="partner-logo" alt="Ярославль">
-      <img src="images/logo-dixy.png" class="partner-logo" alt="Дикси">
-      <img src="images/logo-beeline.png" class="partner-logo" alt="Билайн">
-      <img src="images/logo-perekrestok.png" class="partner-logo" alt="Перекресток">
-      <img src="images/logo-megafon.png" class="partner-logo" alt="Мегафон">
-      <img src="images/logo-danone.png" class="partner-logo" alt="Danone">
+      <img src="images/logo-gazprom.png" class="partner-logo">
+      <img src="images/logo-chery.png" class="partner-logo">
+      <img src="images/logo-magnit.png" class="partner-logo">
+      <img src="images/logo-rostelecom.png" class="partner-logo">
+      <img src="images/logo-yaroslavl.png" class="partner-logo">
+      <img src="images/logo-dixy.png" class="partner-logo">
+      <img src="images/logo-beeline.png" class="partner-logo">
+      <img src="images/logo-perekrestok.png" class="partner-logo">
+      <img src="images/logo-megafon.png" class="partner-logo">
+      <img src="images/logo-danone.png" class="partner-logo">
+      <img src="images/logo-gazprom.png" class="partner-logo">
+      <img src="images/logo-chery.png" class="partner-logo">
+      <img src="images/logo-magnit.png" class="partner-logo">
+      <img src="images/logo-rostelecom.png" class="partner-logo">
+      <img src="images/logo-yaroslavl.png" class="partner-logo">
+      <img src="images/logo-dixy.png" class="partner-logo">
+      <img src="images/logo-beeline.png" class="partner-logo">
+      <img src="images/logo-perekrestok.png" class="partner-logo">
+      <img src="images/logo-megafon.png" class="partner-logo">
+      <img src="images/logo-danone.png" class="partner-logo">
     </div>
   </div>
 </div>
 
+<section id="about" class="section-py" style="background: linear-gradient(135deg, #0a0a0c, #050505);">
+  <div class="container gs-reveal">
+    <div class="about-grid">
+      <div class="about-img">
+         <img src="images/hero-portrait.png" alt="Дмитрий Костюк">
+      </div>
+      <div class="about-content">
+        <h2>ДМИТРИЙ <span class="text-gold">КОСТЮК</span></h2>
+        <p>Иллюзионист нового поколения. Создатель премиальных шоу и наставник для будущих звезд магии.</p>
+        <p>Мои выступления — это сочетание психологической магии, ловкости рук и театрального искусства. Я не просто показываю фокусы, я создаю атмосферу чуда, которая объединяет гостей.</p>
+        <div class="about-quote">«Магия — это не обман, это искусство удивлять»</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="formats" class="section-py">
   <div class="container">
-    <h2 class="text-center gs-reveal" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:50px;">Форматы</h2>
+    <h2 class="text-center gs-reveal">Форматы</h2>
     <div class="grid-cards">
       <div class="card">
         <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M8 21h8m-4-4v4m0-4L3 6a2 2 0 0 1 1.7-3h14.6a2 2 0 0 1 1.7 3l-9 11z"></path></svg></div>
@@ -138,10 +141,11 @@
 </section>
 
 <section id="calc" class="section-py">
-  <div class="container gs-reveal" id="calc">
-    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:40px;">Стоимость за 3 шага</h2>
+  <div class="container gs-reveal">
+    <h2 class="text-center">Калькулятор</h2>
     <div class="wizard-box">
       <div class="wizard-progress"><div class="progress-bar" id="wizProgress"></div></div>
+      
       <div class="wizard-step active" id="step1">
         <h3 class="step-title">1. Где и когда?</h3>
         <label>Регион</label>
@@ -152,8 +156,9 @@
         <input type="date" id="date" class="input-field">
         <div class="wiz-controls"><button class="btn btn-primary" onclick="nextStep(2)" style="width:100%">Далее →</button></div>
       </div>
+      
       <div class="wizard-step" id="step2">
-        <h3 class="step-title">2. Выберите услуги</h3>
+        <h3 class="step-title">2. Услуги</h3>
         <div id="svcOptions" class="svc-grid"></div>
         <label style="margin-top:20px;">Гостей: <span id="gLabel" style="color:var(--gold-primary)">50</span></label>
         <input type="range" id="gRange" min="10" max="300" value="50" oninput="document.getElementById('gLabel').innerText=this.value" class="input-field" style="height:6px; padding:0">
@@ -162,8 +167,9 @@
           <button class="btn btn-primary" onclick="calcResult()" style="flex:1">Рассчитать</button>
         </div>
       </div>
+      
       <div class="wizard-step" id="step3">
-        <h3 class="step-title text-center">Ваша смета</h3>
+        <h3 class="step-title text-center">Смета</h3>
         <div class="receipt">
           <div class="receipt-row"><span>Программа</span><strong id="rSvc" style="text-align:right">...</strong></div>
           <div class="receipt-row"><span>Логистика</span><span id="rRoad">0 ₽</span></div>
@@ -184,8 +190,8 @@
 
 <section class="section-py game-section">
   <div class="container gs-reveal">
-    <h2 style="font-family:var(--ff-head); font-size:2rem;">Испытай удачу</h2>
-    <p style="color:#888;">Найди <span style="color:#fff">Туза Пик</span>. Шанс раз в сутки.</p>
+    <h2>Испытай удачу</h2>
+    <p style="color:#888;">Найди <span style="color:#fff">Туза Пик</span> и получи скидку.</p>
     <div class="deck" id="gameDeck"></div>
     <div id="gameMsg" style="min-height:24px; color:var(--gold-light); font-weight:bold;"></div>
   </div>
@@ -193,31 +199,31 @@
 
 <section class="section-py">
   <div class="container gs-reveal">
-    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2rem; margin-bottom:40px;">Видео-отзывы</h2>
+    <h2 class="text-center">Отзывы</h2>
     <div class="reviews-grid">
-      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Александр</div><div class="review-role">CEO</div></div>
-      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Мария</div><div class="review-role">Event</div></div>
-      </div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" muted loop playsinline></video></div><div class="review-author">Александр</div></div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" muted loop playsinline></video></div><div class="review-author">Мария</div></div>
+    </div>
   </div>
 </section>
 
 <section id="gallery" class="section-py">
   <div class="container gs-reveal">
-    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2rem; margin-bottom:30px;">Галерея</h2>
+    <h2 class="text-center">Галерея</h2>
     <div class="gallery-grid" id="galGrid"></div>
   </div>
 </section>
 
 <section class="section-py">
   <div class="container gs-reveal">
-    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:40px;">Все вопросы</h2>
+    <h2 class="text-center">Вопросы</h2>
     <div class="faq-grid" id="faqContainer"></div>
   </div>
 </section>
 
 <section id="order" class="section-py">
   <div class="container gs-reveal" style="max-width:500px; text-align:center;">
-    <h2 style="font-family:var(--ff-head); font-size:2rem; margin-bottom:20px;">Связь</h2>
+    <h2 style="margin-bottom:20px;">Связь</h2>
     <form id="tgForm">
       <input type="text" name="name" placeholder="Ваше Имя" class="input-field" required>
       <input type="tel" name="phone" placeholder="Телефон" class="input-field" required>
@@ -235,33 +241,14 @@
 <div class="story-viewer" id="storyViewer" onclick="closeReview()">
   <div class="story-content" onclick="event.stopPropagation()">
     <button class="story-close" onclick="closeReview()">×</button>
-    <video id="storyVideo" class="story-video" src="" playsinline loop></video>
-  </div>
-</div>
-
-<div id="schoolModal" class="modal">
-  <div class="school-modal-content">
-    <button class="close-btn" onclick="closeSchoolModal()">×</button>
-    <h2>Школа Фокусов</h2>
-    <p>Станьте душой компании, научитесь управлять вниманием и дарить эмоции.</p>
-    <div class="school-features">
-      <div class="school-feat"><span>Харизма и уверенность в себе</span></div>
-      <div class="school-feat"><span>Сценическая речь</span></div>
-      <div class="school-feat"><span>Мини-группы до 10 человек</span></div>
-    </div>
-    <form id="schoolForm" style="margin-top:20px;">
-      <input type="text" name="parent" placeholder="Ваше Имя" class="input-field" required>
-      <input type="tel" name="phone" id="schoolPhone" placeholder="Телефон" class="input-field" required>
-      <input type="number" name="age" placeholder="Возраст (если для ребёнка)" class="input-field">
-      <button class="btn btn-primary" style="width:100%">Записаться на пробный</button>
-    </form>
+    <video id="storyVideo" class="story-video" src="" playsinline loop controls></video>
   </div>
 </div>
 
 <div class="modal" id="modalVideo">
   <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000">
     <button class="close-btn" onclick="closeVideo()">×</button>
-    <div id="vidContainer" style="width:100%; height:100%"></div>
+    <div id="vidContainer"></div>
   </div>
 </div>
 
