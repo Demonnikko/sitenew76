@@ -14,14 +14,14 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Manrope:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Manrope:wght@300;400;600;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
 <style>
-/* === CSS STYLES === */
+/* === CSS СТИЛИ === */
 :root {
   --bg: #050505;
   --bg-panel: rgba(20, 20, 22, 0.85);
@@ -298,7 +298,7 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .back { background: linear-gradient(135deg, #111, #333); border: 2px solid var(--gold-primary); transform: rotateY(0deg); z-index: 2; }
 .front { transform: rotateY(180deg); color: #000; }
 
-/* === REVIEWS & FAQ === */
+/* === REVIEWS (TELEGRAM STYLE) & FAQ === */
 .reviews-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 850px; margin: 0 auto; }
 .tg-review-item { display: flex; flex-direction: column; align-items: center; width: 200px; }
 .tg-circle {
@@ -311,7 +311,33 @@ label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #888; tex
 .tg-circle:hover { transform: scale(1.05); border-color: #fff; }
 .tg-circle video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
 .review-author { font-weight: 700; color: #fff; font-family: var(--ff-head); font-size: 1rem; text-align: center; }
+.review-role { color: var(--gold-primary); font-size: 0.85rem; text-align: center; }
 
+/* === STORY VIEWER (TELEGRAM STYLE MODAL) === */
+.story-viewer {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(20px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.story-viewer.active { opacity: 1; pointer-events: all; }
+.story-content {
+  position: relative; max-width: 420px; width: 90vw; max-height: 90vh; aspect-ratio: 9/16;
+  border-radius: 20px; overflow: hidden; box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+  border: 1px solid #333; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.story-viewer.active .story-content { transform: scale(1); }
+.story-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.story-close {
+  position: absolute; top: 20px; right: 20px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+  cursor: pointer; z-index: 10; transition: 0.2s;
+}
+.story-close:hover { background: #fff; color: #000; }
+
+/* === FAQ UPDATE === */
 .faq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)); gap: 15px; transition: max-height 0.5s ease; }
 @media (min-width: 768px) { .faq-grid { grid-template-columns: 1fr 1fr; } }
 .faq-item.hidden { display: none; }
@@ -334,14 +360,7 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 .modal.open { display: flex; }
 .close-btn { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 2rem; background: none; border: none; cursor: pointer; z-index: 201; }
 
-.story-viewer { position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.95); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-.story-viewer.active { opacity: 1; pointer-events: all; }
-.story-content { position: relative; max-width: 420px; width: 90vw; max-height: 90vh; aspect-ratio: 9/16; border-radius: 20px; overflow: hidden; border: 1px solid #333; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.story-viewer.active .story-content { transform: scale(1); }
-.story-video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.story-close { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; z-index: 10; transition: 0.2s; }
-.story-close:hover { background: #fff; color: #000; }
-
+.modal-content { background: linear-gradient(135deg, #0D1424, #000); padding: 40px; border-radius: 20px; border: 1px solid #333; max-width: 800px; position: relative; }
 </style>
 </head>
 <body>
@@ -349,526 +368,714 @@ details div { padding: 0 20px 20px; color: #aaa; font-size: 0.9rem; line-height:
 <div class="magic-cursor"></div>
 
 <svg style="display: none;">
-  <filter id="velvet-noise">
-    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
-    <feColorMatrix type="saturate" values="0" />
-    <feComponentTransfer><feFuncA type="linear" slope="0.4" /></feComponentTransfer>
-    <feBlend mode="multiply" in2="SourceGraphic" />
-  </filter>
+  <filter id="velvet-noise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+    <feColorMatrix type="saturate" values="0" />
+    <feComponentTransfer>
+      <feFuncA type="linear" slope="0.4" />
+    </feComponentTransfer>
+    <feBlend mode="multiply" in2="SourceGraphic" />
+  </filter>
 </svg>
 
 <div class="curtain-wrapper">
-  <div class="curtain-bg"></div>
-  <div class="curtain-spotlight"></div>
-  <div class="curtain-panel left"></div>
-  <div class="curtain-panel right"></div>
-  <div class="curtain-content">
-    <div class="curtain-text">KOSTYUK PROJECT</div>
-    <div class="curtain-subtext">Premium Magic Show</div>
-  </div>
+  <div class="curtain-bg"></div>
+  <div class="curtain-spotlight"></div>
+  <div class="curtain-panel left"></div>
+  <div class="curtain-panel right"></div>
+  <div class="curtain-content">
+    <div class="curtain-text">KOSTYUK PROJECT</div>
+    <div class="curtain-subtext">Premium Magic Show</div>
+  </div>
 </div>
 
 <canvas id="webgl-canvas"></canvas>
 
 <header class="header">
-  <div class="container nav-flex">
-    <a href="#" class="logo">KOSTYUK <span>PROJECT</span></a>
-    <button class="burger" onclick="toggleMenu()">
-      <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-    </button>
-  </div>
+  <div class="container nav-flex">
+    <a href="#" class="logo">KOSTYUK <span>PROJECT</span></a>
+    
+    <button class="burger" onclick="toggleMenu()">
+      <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+  </div>
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="afisha.html" class="nav-card gold" onclick="toggleMenu()">
-    <span>Корпоративы и Праздники</span>
-    <h3>КОНЦЕРТНЫЕ ШОУ</h3>
-  </a>
-  <div style="height: 20px;"></div>
-  
-    <a href="school.html" class="nav-card silver" onclick="toggleMenu()">
-    <span>Обучение с нуля</span>
-    <h3>ШКОЛА ФОКУСОВ</h3>
-  </a>
+  <a href="afisha.html" class="nav-card gold" onclick="toggleMenu()">
+    <span>Корпоративы и Праздники</span>
+    <h3>КОНЦЕРТНЫЕ ШОУ</h3>
+  </a>
+
+  <div style="height: 20px;"></div>
+
+  <a href="school.html" class="nav-card silver" onclick="toggleMenu()">
+    <span>Обучение с нуля</span>
+    <h3>ШКОЛА ФОКУСОВ</h3>
+  </a>
 </div>
 
 <section id="hero" class="hero">
-    <div class="hero-img"></div>
-  <div class="container">
-    <div class="hero-content">
-      <h1 class="hero-title">Магия <br><span class="text-gold">Высокого Уровня</span></h1>
-      <p class="hero-desc">Премиальное шоу для тех, кто видел всё. Интеллектуально. Стильно. Дорого.</p>
-      <div class="hero-btns">
-        <button class="btn btn-glass" onclick="openVideo()">
-          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-          Смотреть промо
-        </button>
-      </div>
-    </div>
-  </div>
+  <div class="hero-img">
+    <div id="hero-particles-container"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">Магия <br><span class="text-gold">Высокого Уровня</span></h1>
+      <p class="hero-desc">Премиальное шоу для тех, кто видел всё. Интеллектуально. Стильно. Дорого.</p>
+      <div class="hero-btns">
+        
+        <button class="btn btn-glass" onclick="openVideo()">
+          <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Смотреть промо
+        </button>
+      </div>
+      
+    </div>
+  </div>
 </section>
 
 <div class="partners-section">
-  <div class="container" style="overflow:hidden;">
-    <p class="text-center" style="color:#666; font-size:0.75rem; margin-bottom:20px; letter-spacing:0.1em; text-transform:uppercase;">Нам доверяют</p>
-    <div class="partners-track">
-      <img src="images/logo-gazprom.png" class="partner-logo">
-      <img src="images/logo-chery.png" class="partner-logo">
-      <img src="images/logo-magnit.png" class="partner-logo">
-      <img src="images/logo-rostelecom.png" class="partner-logo">
-      <img src="images/logo-yaroslavl.png" class="partner-logo">
-      <img src="images/logo-dixy.png" class="partner-logo">
-      <img src="images/logo-beeline.png" class="partner-logo">
-      <img src="images/logo-perekrestok.png" class="partner-logo">
-      <img src="images/logo-megafon.png" class="partner-logo">
-      <img src="images/logo-danone.png" class="partner-logo">
-            <img src="images/logo-gazprom.png" class="partner-logo">
-      <img src="images/logo-chery.png" class="partner-logo">
-      <img src="images/logo-magnit.png" class="partner-logo">
-      <img src="images/logo-rostelecom.png" class="partner-logo">
-      <img src="images/logo-yaroslavl.png" class="partner-logo">
-    </div>
-  </div>
+  <div class="container" style="overflow:hidden;">
+    <p class="text-center" style="color:#666; font-size:0.75rem; margin-bottom:20px; letter-spacing:0.1em; text-transform:uppercase;">Нам доверяют</p>
+    <div class="partners-track">
+      <img src="images/logo-gazprom.png" class="partner-logo" alt="Газпром">
+      <img src="images/logo-chery.png" class="partner-logo" alt="Chery">
+      <img src="images/logo-magnit.png" class="partner-logo" alt="Магнит">
+      <img src="images/logo-rostelecom.png" class="partner-logo" alt="Ростелеком">
+      <img src="images/logo-yaroslavl.png" class="partner-logo" alt="Ярославль">
+      <img src="images/logo-dixy.png" class="partner-logo" alt="Дикси">
+      <img src="images/logo-beeline.png" class="partner-logo" alt="Билайн">
+      <img src="images/logo-perekrestok.png" class="partner-logo" alt="Перекресток">
+      <img src="images/logo-megafon.png" class="partner-logo" alt="Мегафон">
+      <img src="images/logo-danone.png" class="partner-logo" alt="Danone">
+
+      <img src="images/logo-gazprom.png" class="partner-logo" alt="Газпром">
+      <img src="images/logo-chery.png" class="partner-logo" alt="Chery">
+      <img src="images/logo-magnit.png" class="partner-logo" alt="Магнит">
+      <img src="images/logo-rostelecom.png" class="partner-logo" alt="Ростелеком">
+      <img src="images/logo-yaroslavl.png" class="partner-logo" alt="Ярославль">
+      <img src="images/logo-dixy.png" class="partner-logo" alt="Дикси">
+      <img src="images/logo-beeline.png" class="partner-logo" alt="Билайн">
+      <img src="images/logo-perekrestok.png" class="partner-logo" alt="Перекресток">
+      <img src="images/logo-megafon.png" class="partner-logo" alt="Мегафон">
+      <img src="images/logo-danone.png" class="partner-logo" alt="Danone">
+    </div>
+  </div>
 </div>
 
 <section id="formats" class="section-py">
-  <div class="container">
-    <h2 class="text-center gs-reveal">Форматы</h2>
-    <div class="grid-cards">
-      <div class="card">
-        <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M8 21h8m-4-4v4m0-4L3 6a2 2 0 0 1 1.7-3h14.6a2 2 0 0 1 1.7 3l-9 11z"></path></svg></div>
-        <h3>Микромагия</h3>
-        <span class="card-price">от 13 000 ₽</span>
-        <ul><li>Welcome-зона</li><li>Фокусы в руках гостей</li><li>Ледокол для общения</li></ul>
-      </div>
-      <div class="card" style="border-color:var(--gold-dark);">
-        <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></div>
-        <h3>Сценическое шоу</h3>
-        <span class="card-price">от 17 500 ₽</span>
-        <ul><li>Интерактив с залом</li><li>Чтение мыслей</li><li>Комедия</li></ul>
-      </div>
-      <div class="card">
-        <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg></div>
-        <h3>Шоу «СЕКРЕТ»</h3>
-        <span class="card-price">от 150 000 ₽</span>
-        <ul><li>Полноценный концерт</li><li>Атмосферный спектакль</li><li>Для больших залов</li></ul>
-      </div>
-    </div>
-  </div>
+  <div class="container">
+    <h2 class="text-center gs-reveal" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:50px;">Форматы</h2>
+    <div class="grid-cards">
+      <div class="card">
+        <div class="card-icon-wrap">
+          <svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M8 21h8m-4-4v4m0-4L3 6a2 2 0 0 1 1.7-3h14.6a2 2 0 0 1 1.7 3l-9 11z"></path></svg>
+        </div>
+        <h3>Микромагия</h3>
+        <span class="card-price">от 13 000 ₽</span>
+        <ul><li>Welcome-зона</li><li>Фокусы в руках гостей</li><li>Ледокол для общения</li></ul>
+      </div>
+      <div class="card" style="border-color:var(--gold-dark);">
+        <div class="card-icon-wrap">
+          <svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </div>
+        <h3>Сценическое шоу</h3>
+        <span class="card-price">от 17 500 ₽</span>
+        <ul><li>Интерактив с залом</li><li>Чтение мыслей</li><li>Комедия</li></ul>
+      </div>
+      <div class="card">
+        <div class="card-icon-wrap">
+          <svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>
+        </div>
+        <h3>Шоу «СЕКРЕТ»</h3>
+        <span class="card-price">от 150 000 ₽</span>
+        <ul><li>Полноценный концерт</li><li>Атмосферный спектакль</li><li>Для больших залов</li></ul>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="calc" class="section-py">
-  <div class="container gs-reveal" id="calc">
-    <h2 class="text-center">Калькулятор</h2>
-    <div class="wizard-box">
-      <div class="wizard-progress"><div class="progress-bar" id="wizProgress"></div></div>
-      <div class="wizard-step active" id="step1">
-        <h3 class="step-title">1. Где и когда?</h3>
-        <label>Регион</label>
-        <select id="area" class="input-field" onchange="updateCities()"><option value="" disabled selected>Выберите область</option></select>
-        <label>Город</label>
-        <select id="city" class="input-field" disabled><option>Сначала область</option></select>
-        <label>Дата</label>
-        <input type="date" id="date" class="input-field">
-        <div class="wiz-controls"><button class="btn btn-primary" onclick="nextStep(2)">Далее →</button></div>
-      </div>
-      <div class="wizard-step" id="step2">
-        <h3 class="step-title">2. Услуги</h3>
-        <div id="svcOptions" class="svc-grid"></div>
-        <label style="margin-top:20px;">Гостей: <span id="gLabel" style="color:var(--gold-primary)">50</span></label>
-        <input type="range" id="gRange" min="10" max="300" value="50" oninput="document.getElementById('gLabel').innerText=this.value" class="input-field" style="height:6px; padding:0">
-        <div class="wiz-controls"><button class="btn btn-glass" onclick="nextStep(1)">Назад</button><button class="btn btn-primary" onclick="calcResult()">Рассчитать</button></div>
-      </div>
-      <div class="wizard-step" id="step3">
-        <h3 class="step-title text-center">Смета</h3>
-        <div class="receipt">
-          <div class="receipt-row"><span>Программа</span><strong id="rSvc" style="text-align:right">...</strong></div>
-          <div class="receipt-row"><span>Логистика</span><span id="rRoad">0 ₽</span></div>
-          <div class="receipt-row"><span>Гости</span><span id="rGuest">0 ₽</span></div>
-          <div class="receipt-row"><span>Сезонный коэф.</span><span id="rCoef">1.0</span></div>
-          <div class="receipt-row" style="color:var(--gold-primary)"><span>Скидка</span><span id="rDisc">0 ₽</span></div>
-          <div id="bonusContainer"></div>
-          <span class="receipt-total" id="rTotal">0 ₽</span>
-        </div>
-        <div class="wiz-controls"><a href="#order" class="btn btn-primary" style="width:100%">Забронировать</a><button class="btn btn-glass" onclick="nextStep(2)">Изменить</button></div>
-      </div>
-    </div>
-  </div>
+  <div class="container gs-reveal" id="calc">
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:40px;">Стоимость за 3 шага</h2>
+    <div class="wizard-box">
+      <div class="wizard-progress"><div class="progress-bar" id="wizProgress"></div></div>
+      
+      <div class="wizard-step active" id="step1">
+        <h3 class="step-title">1. Где и когда?</h3>
+        <label>Регион</label>
+        <select id="area" class="input-field" onchange="updateCities()"><option value="" disabled selected>Выберите область</option></select>
+        <label>Город</label>
+        <select id="city" class="input-field" disabled><option>Сначала область</option></select>
+        <label>Дата</label>
+        <input type="date" id="date" class="input-field">
+        <div class="wiz-controls"><button class="btn btn-primary" onclick="nextStep(2)" style="width:100%">Далее →</button></div>
+      </div>
+      
+      <div class="wizard-step" id="step2">
+        <h3 class="step-title">2. Выберите услуги (можно несколько)</h3>
+        
+        <div id="svcOptions" class="svc-grid"></div>
+
+        <label style="margin-top:20px;">Гостей: <span id="gLabel" style="color:var(--gold-primary)">50</span></label>
+        <input type="range" id="gRange" min="10" max="300" value="50" oninput="document.getElementById('gLabel').innerText=this.value" class="input-field" style="height:6px; padding:0">
+        <div class="wiz-controls">
+          <button class="btn btn-glass" onclick="nextStep(1)">Назад</button>
+          <button class="btn btn-primary" onclick="calcResult()" style="flex:1">Рассчитать</button>
+        </div>
+      </div>
+      
+      <div class="wizard-step" id="step3">
+        <h3 class="step-title text-center">Ваша смета</h3>
+        <div class="receipt">
+          <div class="receipt-row"><span>Программа</span><strong id="rSvc" style="text-align:right">...</strong></div>
+          <div class="receipt-row"><span>Логистика</span><span id="rRoad">0 ₽</span></div>
+          <div class="receipt-row"><span>Гости</span><span id="rGuest">0 ₽</span></div>
+          <div class="receipt-row"><span>Сезонный коэф.</span><span id="rCoef">1.0</span></div>
+          <div class="receipt-row" style="color:var(--gold-primary)"><span>Скидка</span><span id="rDisc">0 ₽</span></div>
+          
+          <div id="bonusContainer"></div>
+
+          <span class="receipt-total" id="rTotal">0 ₽</span>
+        </div>
+        <div class="wiz-controls" style="flex-direction:column">
+          <a href="#order" class="btn btn-primary" style="width:100%">Забронировать</a>
+          <button class="btn btn-glass" onclick="nextStep(2)" style="width:100%; border:none">Изменить</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="section-py game-section">
-  <div class="container gs-reveal">
-    <h2>Испытай удачу</h2>
-    <p style="color:#888;">Найди <span style="color:#fff">Туза Пик</span> и получи скидку.</p>
-    <div class="deck" id="gameDeck"></div>
-    <div id="gameMsg" style="min-height:24px; color:var(--gold-light); font-weight:bold;"></div>
-  </div>
+  <div class="container gs-reveal">
+    <h2 style="font-family:var(--ff-head); font-size:2rem;">Испытай удачу</h2>
+    <p style="color:#888;">Найди <span style="color:#fff">Туза Пик</span>. Шанс раз в сутки.</p>
+    <div class="deck" id="gameDeck"></div>
+    <div id="gameMsg" style="min-height:24px; color:var(--gold-light); font-weight:bold;"></div>
+  </div>
 </section>
 
 <section class="section-py">
-  <div class="container gs-reveal">
-    <h2 class="text-center">Отзывы</h2>
-    <div class="reviews-grid">
-      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" muted loop playsinline></video></div><div class="review-author">Александр</div></div>
-      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" muted loop playsinline></video></div><div class="review-author">Мария</div></div>
-    </div>
-  </div>
+  <div class="container gs-reveal">
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2rem; margin-bottom:40px;">Видео-отзывы</h2>
+    <div class="reviews-grid">
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Александр</div><div class="review-role">CEO</div></div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Мария</div><div class="review-role">Event</div></div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-people-talking-in-a-meeting-room-3512-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Агентство</div><div class="review-role">Партнеры</div></div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Елена</div><div class="review-role">HR</div></div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" autoplay muted loop playsinline></video></div><div class="review-author">Дмитрий</div><div class="review-role">Юбилей</div></div>
+    </div>
+  </div>
 </section>
 
 <section id="gallery" class="section-py">
-  <div class="container gs-reveal">
-    <h2 class="text-center">Галерея</h2>
-    <div class="gallery-grid" id="galGrid"></div>
-  </div>
+  <div class="container gs-reveal">
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2rem; margin-bottom:30px;">Галерея</h2>
+    <div class="gallery-grid" id="galGrid"></div>
+  </div>
 </section>
 
 <section class="section-py">
-  <div class="container gs-reveal">
-    <h2 class="text-center">Вопросы</h2>
-    <div class="faq-grid" id="faqContainer"></div>
-  </div>
+  <div class="container gs-reveal">
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:2.5rem; margin-bottom:40px;">Все вопросы</h2>
+    <div class="faq-grid" id="faqContainer"></div>
+  </div>
 </section>
 
 <section id="order" class="section-py">
-  <div class="container gs-reveal" style="max-width:500px; text-align:center;">
-    <h2 style="margin-bottom:20px;">Связь</h2>
-    <form id="tgForm">
-      <input type="text" name="name" placeholder="Ваше Имя" class="input-field" required>
-      <input type="tel" name="phone" placeholder="Телефон" class="input-field" required>
-      <textarea name="msg" placeholder="Комментарий / Дата" class="input-field" rows="3"></textarea>
-      <input type="hidden" name="bonuses" id="formBonuses">
-      <input type="hidden" name="services" id="formServices">
-      <input type="text" name="website" id="hp_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;height:0;width:0;opacity:0" aria-hidden="true">
-      <button class="btn btn-primary" style="width:100%">Отправить</button>
-    </form>
-  </div>
+  <div class="container gs-reveal" style="max-width:500px; text-align:center;">
+    <h2 style="font-family:var(--ff-head); font-size:2rem; margin-bottom:20px;">Связь</h2>
+    <form id="tgForm">
+      <input type="text" name="name" placeholder="Ваше Имя" class="input-field" required>
+      <input type="tel" name="phone" placeholder="Телефон" class="input-field" required>
+      <textarea name="msg" placeholder="Комментарий / Дата" class="input-field" rows="3"></textarea>
+      <input type="hidden" name="bonuses" id="formBonuses">
+      <input type="hidden" name="services" id="formServices">
+      <input type="text" name="website" id="hp_website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;height:0;width:0;opacity:0" aria-hidden="true">
+      <button class="btn btn-primary" style="width:100%">Отправить</button>
+    </form>
+  </div>
 </section>
 
 <footer style="text-align:center; padding:40px 0; color:#444; font-size:0.8rem;">© 2025 Дмитрий Костюк</footer>
 
-<div id="modalVideo" class="modal">
-  <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000; padding:0; border:none;">
-    <button class="close-btn" onclick="closeVideo()" style="right:10px; top:10px; z-index:10; background:rgba(0,0,0,0.5); width:30px; height:30px; border-radius:50%;">×</button>
-    <div id="vidContainer" style="width:100%; height:100%"></div>
-  </div>
+<div class="story-viewer" id="storyViewer" onclick="closeReview()">
+  <div class="story-content" onclick="event.stopPropagation()">
+    <button class="story-close" onclick="closeReview()">×</button>
+    <video id="storyVideo" class="story-video" src="" playsinline loop></video>
+  </div>
 </div>
 
-<div class="story-viewer" id="storyViewer" onclick="closeReview()">
-  <div class="story-content" onclick="event.stopPropagation()">
-    <button class="story-close" onclick="closeReview()">×</button>
-    <video id="storyVideo" class="story-video" src="" playsinline loop></video>
-  </div>
+<div class="modal" id="modalVideo">
+  <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000">
+    <button class="close-btn" onclick="closeVideo()">×</button>
+    <div id="vidContainer" style="width:100%; height:100%"></div>
+  </div>
 </div>
 
 <div class="modal" id="modalImg" onclick="this.classList.remove('open')">
-  <button class="close-btn">×</button>
-  <img id="lbImg" src="" style="max-width:95vw; max-height:90vh; border-radius:8px;">
+  <button class="close-btn">×</button>
+  <img id="lbImg" src="" style="max-width:95vw; max-height:90vh; border-radius:8px;">
 </div>
 
 <script>
 /* === CONTENT GENERATION === */
 window.addEventListener("DOMContentLoaded", () => {
-  
-  // 1. СРАЗУ СКРОЛЛИМ НАВЕРХ
-  if (history.scrollRestoration) history.scrollRestoration = 'manual';
-  window.scrollTo(0, 0);
+  
+  // 1. СРАЗУ СКРОЛЛИМ НАВЕРХ
+  if (history.scrollRestoration) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
 
-  // 2. АНИМАЦИЯ
-  const tl = gsap.timeline({
-      onComplete: () => {
-          document.body.classList.add('loaded'); // Разблокируем скролл
-          const c = document.querySelector('.curtain-wrapper');
-          if(c) {
-             c.style.opacity = 0;
-             setTimeout(() => c.style.display = 'none', 1000);
-          }
-      }
-  });
-  tl.to(".curtain-text", { opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" })
-    .to(".curtain-subtext", { opacity: 1, y: 0, duration: 1, ease: "power2.out" }, "-=0.5")
-    .to(".curtain-panel.left", { xPercent: -100, duration: 2, ease: "power2.inOut" }, "+=0.5")
-    .to(".curtain-panel.right", { xPercent: 100, duration: 2, ease: "power2.inOut" }, "<")
-    .to(".curtain-content", { opacity: 0, scale: 1.2, duration: 1.5, ease: "power2.in" }, "<")
-    .to(".curtain-bg", { opacity: 0, duration: 1 }, "-=1.5")
-    .to({}, { duration: 2, onUpdate: function() { if(typeof heroParticlesMaterial !== 'undefined' && heroParticlesMaterial) { gsap.to(heroParticlesMaterial.uniforms.uProgress, { value: 1, duration: 4, ease: "power2.out" }); } } }, "-=2.0")
-    .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.0")
-    .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.5")
-    .from(".hero-btns", { y: 30, opacity: 0, duration: 0.8 }, "-=0.5");
+  // 2. АНИМАЦИЯ
+  const tl = gsap.timeline({
+      onComplete: () => {
+          document.body.classList.add('loaded'); // Разблокируем скролл
+          const c = document.querySelector('.curtain-wrapper');
+          if(c) {
+             c.style.opacity = 0;
+             setTimeout(() => c.style.display = 'none', 1000);
+          }
+      }
+  });
 
-  // INIT ALL
-  initThreeJS();
-  initHeroParticles();
-  updateServices();
-  initGame();
-  
-  // FAQ
-  const faqData = [
-      {q: "За сколько бронировать?", a: "Обычно за 1–2 недели."},
-      {q: "Сколько длится шоу?", a: "От 20 мин до 2 часов."},
-      {q: "Работаете по договору?", a: "Да, ИП/Самозанятость."},
-      {q: "Выезжаете в область?", a: "Да, условия в калькуляторе."},
-      {q: "Нужна ли сцена?", a: "Не обязательно, работаем и в welcome-зоне."},
-      {q: "Можно с детьми?", a: "Да, есть детские программы."}
-  ];
-  document.getElementById('faqContainer').innerHTML = faqData.map((f,i) => 
-      `<details class="faq-item ${i>=6?'hidden':''}"><summary>${f.q}</summary><div>${f.a}</div></details>`
-  ).join('') + (faqData.length>6 ? '<div class="faq-controls"><button class="btn btn-glass" onclick="showAllFaq(this)">Показать все</button></div>' : '');
+  tl.to(".curtain-text", { opacity: 1, scale: 1, duration: 2, ease: "power2.out" })
+    .to(".curtain-subtext", { opacity: 1, y: 0, duration: 1.5, ease: "power2.out" }, "-=1")
+    // Opening Curtains
+    .to(".curtain-panel.left", { xPercent: -100, duration: 2.5, ease: "power2.inOut" }, "+=0.5")
+    .to(".curtain-panel.right", { xPercent: 100, duration: 2.5, ease: "power2.inOut" }, "<")
+    .to(".curtain-content", { opacity: 0, scale: 1.2, duration: 1.5, ease: "power2.in" }, "<")
+    // BG Fade out (reveals site)
+    .to(".curtain-bg", { opacity: 0, duration: 1 }, "-=2.0")
+    // Magic Particles Start
+    .to({}, { duration: 3, onUpdate: function() { if(heroParticlesMaterial) { gsap.to(heroParticlesMaterial.uniforms.uProgress, { value: 1, duration: 4, ease: "power2.out" }); } } }, "-=2.0")
+    // Content Animation
+    .from(".hero-title", { y: 100, opacity: 0, duration: 1, ease: "power3.out" }, "-=1.5")
+    .from(".hero-desc", { y: 30, opacity: 0, duration: 0.8 }, "-=0.8")
+    .from(".hero-btns", { y: 30, opacity: 0, duration: 0.8 }, "-=0.6")
+    .from(".hero-stats", { opacity: 1, duration: 1 }, "-=0.5");
 
-  // Gallery
-  const galGrid = document.getElementById('galGrid');
-  for(let i=1; i<=6; i++){
-      const img = document.createElement('img'); 
-      img.src = `images/${i}.jpg`;
-      img.onerror = () => img.src = `https://via.placeholder.com/300x200/111/333?text=Photo+${i}`;
-      img.onclick = () => { document.getElementById('lbImg').src=img.src; document.getElementById('modalImg').classList.add('open'); };
-      galGrid.appendChild(img);
-  }
-  
-  // Animations Scroll
-  gsap.utils.toArray(".gs-reveal").forEach(elem => {
-      gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 85%" }, y: 40, opacity: 0, duration: 0.8 });
-  });
+
+  // FAQ DATA
+  const faqData = [
+    { q: "За сколько бронировать дату?", a: "Обычно за 1–2 недели; популярные даты — за месяц и раньше." },
+    { q: "Сколько длится программа?", a: "Частные шоу — 20–40 мин, микромагия — до 3 ч, концерт — 1–2 ч." },
+    { q: "Какой размер задатка?", a: "50 % от согласованной суммы. Остальное — в день мероприятия." },
+    { q: "Выезжаете в другие регионы?", a: "Да, работаю в нескольких областях и выезжаю по стране." },
+    { q: "Можно персонализировать трюк?", a: "Да! Подготовим номер под вашего именинника/бренд/событие." },
+    { q: "Нужна ли сцена?", a: "Чаще нет. Для больших залов и концертной программы — по согласованию." },
+    // Hidden Questions
+    { q: "Что по звуку и аппаратуре?", a: "С ведущим — всё готово. Без ведущего нужна активная колонка/микрофон." },
+    { q: "Сколько занимает подготовка?", a: "Около 30 мин; для концертной программы — до 1 ч." },
+    { q: "Способы оплаты?", a: "Безнал, СБП, наличные. Предусмотрен договор и чек." },
+    { q: "Какой возраст для детских шоу?", a: "Для детей 8+; для младших — по согласованию." },
+    { q: "Можно снимать фото/видео?", a: "Да, съёмка приветствуется." },
+    { q: "Есть ли официальное оформление?", a: "Да, работаю по договору (ИП, Самозанятость)." },
+    { q: "Возможна площадка под открытым небом?", a: "Летом при безветренной погоде." },
+    { q: "Безопасны ли спецэффекты?", a: "Используются только сертифицированные и безопасные эффекты." },
+    { q: "Можно ли интегрировать бренд?", a: "Да, интегрируем лого и смыслы бренда в интерактив." },
+    { q: "Что если дата переносится?", a: "Перенос возможен при наличии свободного слота." },
+    { q: "Какой формат аудитории?", a: "От 10 до 500+ человек." },
+    { q: "Проводите мастер-классы?", a: "Да: 60 мин обучения + реквизит в подарок." }
+  ];
+
+  const container = document.getElementById('faqContainer');
+  const VISIBLE_COUNT = 6;
+
+  let html = faqData.map((f, i) => {
+    const isHidden = i >= VISIBLE_COUNT ? 'hidden' : '';
+    return `<details class="faq-item ${isHidden}"><summary>${f.q}</summary><div>${f.a}</div></details>`;
+  }).join('');
+
+  if (faqData.length > VISIBLE_COUNT) {
+    html += `<div class="faq-controls"><button class="btn btn-glass" onclick="showAllFaq(this)">Показать все вопросы (${faqData.length}) <svg class="icon-svg" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></button></div>`;
+  }
+  container.innerHTML = html;
+
+  // Gallery
+  const galGrid = document.getElementById('galGrid');
+  for(let i=1; i<=6; i++){
+    const img = document.createElement('img'); 
+    img.src = `images/${i}.jpg`;
+    img.onerror = () => img.src = `https://via.placeholder.com/300x200/111/333?text=Photo+${i}`;
+    img.onclick = () => { document.getElementById('lbImg').src=img.src; document.getElementById('modalImg').classList.add('open'); };
+    galGrid.appendChild(img);
+  }
+
+  // Init Logic
+  initThreeJS();
+  initHeroParticles();
+  updateServices();
+  initGame();
+
+  gsap.utils.toArray(".card").forEach((card, i) => {
+    gsap.to(card, { scrollTrigger: { trigger: card, start: "top 85%" }, y: 0, opacity: 1, duration: 0.8, delay: i*0.1, ease: "power3.out" });
+  });
+  gsap.utils.toArray(".gs-reveal").forEach(elem => {
+    gsap.from(elem, { scrollTrigger: { trigger: elem, start: "top 80%" }, y: 40, opacity: 0, duration: 1, ease: "power3.out" });
+  });
+  
+  // Date Picker Min Date Fix
+  const dateInput = document.getElementById('date');
+  if (dateInput) {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    dateInput.min = d.toISOString().split('T')[0];
+  }
 });
 
-/* === NAVIGATION === */
-function toggleMenu(){ 
-    document.getElementById('mobileMenu').classList.toggle('open'); 
-    document.querySelector('.burger').classList.toggle('active'); 
-}
+// FAQ LOGIC
 window.showAllFaq = function(btn) {
-  document.querySelectorAll('.faq-item.hidden').forEach(item => {
-    item.classList.remove('hidden'); item.classList.add('fade-in');
-  });
-  btn.style.display = 'none';
+  const hiddenItems = document.querySelectorAll('.faq-item.hidden');
+  hiddenItems.forEach(item => {
+    item.classList.remove('hidden');
+    item.classList.add('fade-in');
+  });
+  btn.style.display = 'none';
 }
 
-/* === MODALS === */
-function openVideo(){ 
-    const m = document.getElementById('modalVideo');
-    m.classList.add('open'); 
-    document.getElementById('vidContainer').innerHTML = '<iframe src="https://rutube.ru/play/embed/a692a6ad3b922abc4cfad5be5898431b?autoplay=1" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>'; 
-}
-function closeVideo(){ 
-    const m = document.getElementById('modalVideo');
-    m.classList.remove('open'); 
-    document.getElementById('vidContainer').innerHTML = ''; 
-}
+/* === STORY VIEWER LOGIC === */
 function openReview(el) {
-    const src = el.querySelector('video').src;
-    const v = document.getElementById('storyVideo');
-    v.src = src; 
-    document.getElementById('storyViewer').classList.add('active');
-    v.play();
+  const vidSrc = el.querySelector('video').src;
+  const viewer = document.getElementById('storyViewer');
+  const viewVid = document.getElementById('storyVideo');
+  viewVid.src = vidSrc;
+  viewer.classList.add('active');
+  viewVid.currentTime = 0; viewVid.play(); viewVid.muted = false;
 }
 function closeReview() {
-    document.getElementById('storyViewer').classList.remove('active');
-    document.getElementById('storyVideo').pause();
+  const viewer = document.getElementById('storyViewer');
+  const viewVid = document.getElementById('storyVideo');
+  viewer.classList.remove('active');
+  setTimeout(() => { viewVid.pause(); viewVid.src = ""; }, 300);
 }
 
-/* === CALCULATOR === */
-const travel={ "Вологодская":{fee:9000,cities:{Вологда:9000,Череповец:15000,Сокол:12000}}, "Владимирская":{fee:10000,cities:{Владимир:10000,Ковров:10000,Муром:17000,"Гусь хрустальный":13500}}, "Ивановская":{fee:5000,cities:{Иваново:2000,Кинешма:3500,Шуя:3000,Тейково:2500}}, "Костромская":{fee:3000,cities:{Кострома:2000,Шарья:6000,Нерехта:2000}}, "Ярославская":{fee:1000,cities:{Ярославль:0,Рыбинск:2000,Тутаев:2000,Углич:2000,Ростов:2000}} };
-const services={ close: { "Микромагия": 13000 }, std: { "Шоу": 17500 }, conc: { "Концерт": 150000 } };
-const catNames = { close: "Микромагия", std: "Шоу", conc: "Концерт" };
-const els={area:document.getElementById('area'),city:document.getElementById('city'),svcGrid:document.getElementById('svcOptions'),date:document.getElementById('date'),gRange:document.getElementById('gRange')};
-Object.keys(travel).forEach(k=>els.area.add(new Option(k,k)));
-
-function updateCities(){els.city.innerHTML='<option disabled selected>Город</option>';els.city.disabled=false;Object.keys(travel[els.area.value].cities).forEach(c=>els.city.add(new Option(c,c)));}
-
-let selectedServices = [];
-function updateServices(){
-  const grid = document.getElementById('svcOptions');
-  grid.innerHTML='';
-  Object.keys(services).forEach(catKey => {
-    const wrapper = document.createElement('div'); wrapper.className = 'svc-category-group';
-    const header = document.createElement('div'); header.className = 'svc-group-title'; header.innerText = catNames[catKey]; wrapper.appendChild(header);
-    const g = document.createElement('div'); g.className = 'svc-grid';
-    Object.keys(services[catKey]).forEach(sName => {
-      const btn = document.createElement('div'); btn.className = 'svc-btn';
-      btn.innerHTML = `<span class="svc-name">${sName}</span><span class="svc-cost">${services[catKey][sName].toLocaleString()} ₽</span>`;
-      btn.onclick = () => toggleService(btn, sName, services[catKey][sName]);
-      g.appendChild(btn);
-    });
-    wrapper.appendChild(g); grid.appendChild(wrapper);
-  });
+/* === VIDEO PROMO LOGIC === */
+function openVideo(){ 
+  document.getElementById('modalVideo').classList.add('open'); 
+  // Вставьте сюда вашу ссылку на промо
+  document.getElementById('vidContainer').innerHTML = '<iframe src="https://rutube.ru/play/embed/a692a6ad3b922abc4cfad5be5898431b?autoplay=1" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>'; 
 }
-function toggleService(btn, name, price) {
-  const idx = selectedServices.findIndex(s => s.name === name);
-  if (idx > -1) { selectedServices.splice(idx, 1); btn.classList.remove('selected'); } 
-  else { selectedServices.push({name, price}); btn.classList.add('selected'); }
-}
-function nextStep(n){
-  if(n===2 && (!els.area.value||!els.city.value)){alert('Выберите регион и город');return;}
-  if(n===2 && els.date.value) { if (new Date(els.date.value) <= new Date().setHours(0,0,0,0)) { alert('Бронирование возможно только с завтрашнего дня.'); return; } }
-  document.querySelectorAll('.wizard-step').forEach(e=>e.classList.remove('active'));
-  document.getElementById('step'+n).classList.add('active');
-  document.getElementById('wizProgress').style.width=(n*33)+'%';
-  if (n===3) document.getElementById('calc').scrollIntoView({behavior: 'smooth'});
-}
-function calcResult(){
-  if (selectedServices.length === 0) { alert('Выберите хотя бы одну услугу'); return; }
-  let base = selectedServices.reduce((sum, s) => sum + s.price, 0);
-  const road = travel[els.area.value].cities[els.city.value];
-  const g = parseInt(els.gRange.value); 
-  const total = base + road + (g>50 ? (g-50)*50 : 0);
-  document.getElementById('rSvc').innerHTML = selectedServices.map(s => s.name).join('<br>');
-  document.getElementById('rRoad').innerText=road.toLocaleString()+' ₽';
-  document.getElementById('rGuest').innerText=(g>50 ? (g-50)*50 : 0).toLocaleString()+' ₽';
-  
-  // Bonuses
-  const bContainer = document.getElementById('bonusContainer'); bContainer.innerHTML = ''; 
-  if (total >= 35000) bContainer.innerHTML += `<div class="bonus-item bonus-tier-3"><div class="bonus-text"><strong>Экстрим</strong>Опасный трюк в подарок!</div><div class="gift-badge">БЕСПЛАТНО</div></div>`;
-  if (total >= 15000) bContainer.innerHTML += `<div class="bonus-item bonus-tier-1"><div class="bonus-text"><strong>Бонус</strong>2 Билета на шоу</div><div class="gift-badge">БЕСПЛАТНО</div></div>`;
-  
-  document.getElementById('rTotal').innerText=total.toLocaleString()+' ₽';
-  nextStep(3);
+function closeVideo(){ 
+  document.getElementById('modalVideo').classList.remove('open'); 
+  document.getElementById('vidContainer').innerHTML = ''; 
 }
 
-/* === GAME === */
-function initGame() {
-    const deck = document.getElementById('gameDeck');
-    const msg = document.getElementById('gameMsg');
-    if (!deck) return;
-    deck.innerHTML = '';
-    
-    // Check Cooldown
-    const lastPlayed = parseInt(localStorage.getItem('game_timestamp')) || 0;
-    const now = Date.now();
-    const cooldown = 24 * 60 * 60 * 1000;
-    
-    if (now - lastPlayed < cooldown) {
-        const hoursLeft = Math.ceil((cooldown - (now - lastPlayed)) / (1000 * 60 * 60));
-        deck.innerHTML = `<div style="padding:20px; border:1px solid #333; border-radius:10px;"><h3>Попытка потрачена</h3><p style="color:#888;">Приходите через ${hoursLeft} ч.</p></div>`;
-        return;
-    }
-
-    const winIdx = Math.floor(Math.random() * 3);
-    for (let i = 0; i < 3; i++) {
-        const isWin = (i === winIdx);
-        const card = document.createElement('div'); card.className = 'card-play';
-        card.innerHTML = `<div class="face back"></div><div class="face front" style="color:#000">${isWin ? 'A♠' : 'J♥'}</div>`;
-        card.onclick = () => {
-            if (deck.classList.contains('played')) return;
-            deck.classList.add('played');
-            localStorage.setItem('game_timestamp', Date.now());
-            document.querySelectorAll('.card-play').forEach(el => el.classList.add('flipped'));
-            if (isWin) { msg.innerText = 'ПОБЕДА! Скидка 20%'; localStorage.setItem('game_win', 'true'); } 
-            else { msg.innerText = 'Увы, повезет в любви.'; localStorage.setItem('game_win', 'false'); }
-        };
-        deck.appendChild(card);
-    }
+/* === AUDIO UX === */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playHoverSound() {
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime+0.1);
+  gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.1);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime+0.1);
 }
+function playClickSound() {
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+  osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime+0.15);
+  gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.15);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime+0.15);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('a, button, .card, input, select, .card-play, .svc-btn').forEach(el => {
+    el.addEventListener('mouseenter', playHoverSound);
+    el.addEventListener('click', playClickSound);
+  });
+});
 
-/* === TELEGRAM === */
+/* === TELEGRAM BOT === */
 const TG_TOKEN = "7838972787:AAHaLNVe6xqEnzE5qy5Uh2TwSb66LWYIUhI";
-const CHAT_ID = 'ВСТАВЬ_СЮДА_ЦИФРЫ_CHAT_ID'; 
+const CHAT_ID = 'ВСТАВЬ_СЮДА_ЦИФРЫ_CHAT_ID'; 
 
+// MAIN FORM
 document.getElementById('tgForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.innerText = 'Отправка...'; btn.disabled = true;
-    const fData = new FormData(e.target);
-    const text = `🔥 Заявка: ${fData.get('name')} | ${fData.get('phone')}`;
-    try {
-        await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ chat_id: CHAT_ID, text: text })
-        });
-        btn.innerText = 'Успешно!'; btn.style.background = '#28a745'; e.target.reset();
-    } catch (err) { alert('Ошибка'); btn.disabled = false; }
+  e.preventDefault();
+  if(document.getElementById('hp_website').value) return;
+  const btn = e.target.querySelector('button');
+  const oldText = btn.innerText;
+  if(CHAT_ID.includes('CHAT_ID')) { alert('Вставь CHAT_ID в код!'); return; }
+  btn.innerText = 'Отправка...'; btn.disabled = true;
+  const fData = new FormData(e.target);
+  const bonuses = document.getElementById('formBonuses').value || 'Нет';
+  const services = document.getElementById('formServices').value || 'Не выбрано';
+  const text = `🔥 *Заявка ШОУ*\n\n👤 ${fData.get('name')}\n📱 ${fData.get('phone')}\n🎩 Услуги: ${services}\n🎁 Бонусы: ${bonuses}\n📝 Инфо: ${fData.get('msg')}`;
+  sendToTg(text, btn, oldText);
 };
 
-/* === THREE.JS PARTICLES === */
+// SCHOOL FORM
+document.getElementById('schoolForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  const oldText = btn.innerText;
+  if(CHAT_ID.includes('CHAT_ID')) { alert('Вставь CHAT_ID в код!'); return; }
+  btn.innerText = 'Отправка...'; btn.disabled = true;
+  const fData = new FormData(e.target);
+  const text = `🎓 *Заявка ШКОЛА*\n\n👤 ${fData.get('parent')}\n📱 ${fData.get('phone')}\n👶 Возраст: ${fData.get('age')}`;
+  sendToTg(text, btn, oldText);
+};
+
+async function sendToTg(text, btn, oldText) {
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'Markdown' })
+    });
+    if(res.ok) {
+      btn.innerText = 'Успешно!'; btn.style.background = '#28a745'; setTimeout(()=>{btn.innerText=oldText; btn.disabled=false; btn.style.background=''}, 3000);
+      if(typeof ym !== 'undefined') ym(104290205,'reachGoal','order_submit');
+    } else throw new Error();
+  } catch (err) {
+    alert('Ошибка отправки.'); btn.innerText = oldText; btn.disabled = false;
+  }
+}
+
+/* === SCHOOL MODAL LOGIC === */
+function openSchoolModal() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.querySelector('.burger').classList.remove('active');
+  document.getElementById('schoolModal').classList.add('open');
+}
+function closeSchoolModal() {
+  document.getElementById('schoolModal').classList.remove('open');
+}
+
+/* === WIZARD LOGIC === */
+function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); document.querySelector('.burger').classList.toggle('active'); }
+const travel={ "Вологодская":{fee:9000,cities:{Вологда:9000,Череповец:15000,Сокол:12000}}, "Владимирская":{fee:10000,cities:{Владимир:10000,Ковров:10000,Муром:17000,"Гусь хрустальный":13500}}, "Ивановская":{fee:5000,cities:{Иваново:2000,Кинешма:3500,Шуя:3000,Тейково:2500}}, "Костромская":{fee:3000,cities:{Кострома:2000,Шарья:6000,Нерехта:2000}}, "Ярославская":{fee:1000,cities:{Ярославль:0,Рыбинск:2000,Тутаев:2000,Углич:2000,Ростов:2000}} };
+const services={
+  close: { "Микромагия (30 мин)": 13000, "Микромагия (1 час)": 20000, "Микромагия (2 часа)": 30000, "Микромагия (3 часа)": 36000 },
+  std: { "Взрослое шоу (20 мин)": 17500, "Взрослое шоу (30 мин)": 23750, "Взрослое шоу (40 мин)": 30000 },
+  spec: { "Свадебное шоу (20 мин)": 26250, "Свадебное шоу (30 мин)": 32500 },
+  kids: { "Детское шоу (30 мин)": 11250, "Детское шоу (40 мин)": 13750 },
+  conc: { "Концерт «СЕКРЕТ» (мини)": 150000, "Концерт «СЕКРЕТ» (полный)": 300000 }
+};
+const catNames = { close: "Микромагия (Welcome)", std: "Сценическое шоу (Банкет)", spec: "Свадьбы и Корпоративы", kids: "Детские праздники", conc: "Концертные шоу" };
+const els={area:document.getElementById('area'),city:document.getElementById('city'),svcGrid:document.getElementById('svcOptions'),date:document.getElementById('date'),gRange:document.getElementById('gRange')};
+Object.keys(travel).forEach(k=>els.area.add(new Option(k,k)));
+function updateCities(){els.city.innerHTML='<option disabled selected>Город</option>';els.city.disabled=false;Object.keys(travel[els.area.value].cities).forEach(c=>els.city.add(new Option(c,c)));}
+let selectedServices = [];
+function updateServices(){
+  els.svcGrid.innerHTML='';
+  selectedServices = []; 
+  Object.keys(services).forEach(catKey => {
+    const wrapper = document.createElement('div'); wrapper.className = 'svc-category-group';
+    const header = document.createElement('div'); header.className = 'svc-group-title'; header.innerText = catNames[catKey]; wrapper.appendChild(header);
+    const grid = document.createElement('div'); grid.className = 'svc-grid';
+    Object.keys(services[catKey]).forEach(sName => {
+      const sPrice = services[catKey][sName];
+      const btn = document.createElement('div'); btn.className = 'svc-btn';
+      btn.innerHTML = `<span class="svc-name">${sName}</span><span class="svc-cost">${sPrice.toLocaleString()} ₽</span>`;
+      btn.onclick = () => toggleService(btn, sName, sPrice);
+      grid.appendChild(btn);
+    });
+    wrapper.appendChild(grid); els.svcGrid.appendChild(wrapper);
+  });
+}
+function toggleService(btn, name, price) {
+  const idx = selectedServices.findIndex(s => s.name === name);
+  if (idx > -1) { selectedServices.splice(idx, 1); btn.classList.remove('selected'); } else { selectedServices.push({name, price}); btn.classList.add('selected'); }
+  playClickSound();
+}
+function nextStep(n){
+  if(n===2 && (!els.area.value||!els.city.value)){alert('Выберите регион и город');return;}
+  
+  // === NEW DATE VALIDATION ===
+  if(n===2 && els.date.value) {
+      const selected = new Date(els.date.value);
+      const now = new Date();
+      now.setHours(0,0,0,0); 
+      if (selected <= now) {
+          alert('Бронирование возможно только с завтрашнего дня.');
+          return; 
+      }
+  }
+
+  document.querySelectorAll('.wizard-step').forEach(e=>e.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  document.getElementById('wizProgress').style.width=(n*33)+'%';
+  
+  // AUTO SCROLL FIX
+  if (n===3) {
+      document.getElementById('calc').scrollIntoView({behavior: 'smooth'});
+  }
+}
+function calcResult(){
+  if (selectedServices.length === 0) { alert('Выберите хотя бы одну услугу'); return; }
+  let base = selectedServices.reduce((sum, s) => sum + s.price, 0);
+  let road=travel[els.area.value].cities[els.city.value];
+  if(els.area.value==='Ярославская'&&els.city.value==='Ярославль') base+=1000;
+  let g=parseInt(els.gRange.value); let gFee=g>50?(g-50)*50:0;
+  let coef=1; if(els.date.value){const d=new Date(els.date.value);if(d.getMonth()===11&&d.getDate()>15)coef=1.5;}
+  const raw=(base+road+gFee)*coef;
+  const isGameWinner = localStorage.getItem('game_win') === 'true';
+  const isBundle = selectedServices.length >= 2;
+  let discPercent = 0; let discReason = 'Нет';
+  if (isGameWinner) { discPercent = 20; discReason = '20% (Победа)'; }
+  else if (isBundle) { discPercent = 10; discReason = '10% (Пакет услуг)'; }
+  const disc = Math.round(raw * (discPercent / 100)); const total = raw - disc;
+  document.getElementById('rSvc').innerHTML = selectedServices.map(s => s.name).join('<br>');
+  document.getElementById('rRoad').innerText=road.toLocaleString()+' ₽';
+  document.getElementById('rGuest').innerText=gFee.toLocaleString()+' ₽';
+  document.getElementById('rCoef').innerText=coef>1?'x'+coef:'1.0';
+  document.getElementById('rDisc').innerText=disc?`-${disc} ₽ (${discReason})`:'0 ₽';
+  document.getElementById('rTotal').innerText=total.toLocaleString()+' ₽';
+  /* BONUS TIERS UPDATED */
+  const bContainer = document.getElementById('bonusContainer'); bContainer.innerHTML = ''; 
+  let activeBonuses = [];
+  if (total >= 35000) { activeBonuses.push("🔥 Опасный трюк"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-3"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg><div class="bonus-text"><strong>Экстрим</strong>Опасный трюк в подарок!</div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  if (total >= 20000) { activeBonuses.push("🎁 Персональный фокус"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-2"><svg class="icon-svg" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg><div class="bonus-text"><strong>VIP</strong>Персональный фокус</div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  if (total >= 15000) { activeBonuses.push("🎫 2 Билета"); bContainer.innerHTML += `<div class="bonus-item bonus-tier-1"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg><div class="bonus-text"><strong>Бонус</strong>2 Билета на концертное шоу <span class="bonus-note">(Город и дату уточняйте)</span></div><div class="gift-badge">БЕСПЛАТНО</div></div>`; }
+  document.getElementById('formBonuses').value = activeBonuses.join(', ');
+  document.getElementById('formServices').value = selectedServices.map(s => s.name).join(', ') + ` [${discReason}]`;
+  nextStep(3);
+}
+
+/* === GAME LOGIC (FIXED) === */
+const deck = document.getElementById('gameDeck');
+const msg = document.getElementById('gameMsg');
+const suits = ['♠', '♥', '♣', '♦'];
+const ranks = ['J', 'Q', 'K', 'A'];
+function initGame() {
+  if (!deck) return;
+  deck.innerHTML = ''; 
+  const lastPlayed = parseInt(localStorage.getItem('game_timestamp')) || 0;
+  const hasWon = localStorage.getItem('game_win') === 'true';
+  const now = Date.now();
+  const cooldown = 24 * 60 * 60 * 1000;
+  const timePassed = now - lastPlayed;
+  
+  if (timePassed >= cooldown) { localStorage.removeItem('game_win'); } 
+
+  if (lastPlayed && timePassed < cooldown) {
+    const hoursLeft = Math.ceil((cooldown - timePassed) / (1000 * 60 * 60));
+    deck.innerHTML = `<div style="padding:30px; border:1px solid #333; border-radius:16px; background:rgba(255,255,255,0.05); backdrop-filter:blur(5px);"><h3 style="margin-bottom:10px; color:#fff;">⏳ Магия восстанавливается</h3><p style="color:#888; font-size:0.9rem;">${hasWon ? 'Вы уже выиграли свою скидку!' : 'Попытка потрачена.'} <br> Следующий шанс через <strong>${hoursLeft} ч.</strong></p></div>`;
+    if (hasWon) msg.innerHTML = '<span style="color:var(--gold-primary)">Скидка 20% активирована</span>';
+    return;
+  }
+  const winIdx = Math.floor(Math.random() * 3);
+  for (let i = 0; i < 3; i++) {
+    const isWin = (i === winIdx);
+    let rSuit, rRank;
+    do { rSuit = suits[Math.floor(Math.random() * 4)]; rRank = ranks[Math.floor(Math.random() * 4)]; } while (rSuit === '♠' && rRank === 'A');
+    const suit = isWin ? '♠' : rSuit; const rank = isWin ? 'A' : rRank;
+    const card = document.createElement('div'); card.className = 'card-play';
+    card.innerHTML = `<div class="face back"></div><div class="face front" style="color:${['♠', '♣'].includes(suit) ? '#000' : '#c00'}">${rank}${suit}</div>`;
+    card.onclick = () => {
+      if (deck.classList.contains('played')) return;
+      localStorage.setItem('game_timestamp', Date.now()); deck.classList.add('played');
+      document.querySelectorAll('.card-play').forEach(el => el.classList.add('flipped'));
+      if (isWin) {
+        msg.innerHTML = '<span style="color:var(--gold-primary); text-shadow:0 0 10px var(--gold-primary);">✨ ПОБЕДА! Скидка 20%</span>';
+        localStorage.setItem('game_win', 'true');
+      } else {
+        msg.textContent = 'Увы, магия не сработала. Попробуйте завтра.';
+        localStorage.setItem('game_win', 'false');
+      }
+      if(typeof calcResult === 'function') setTimeout(calcResult, 1000);
+    };
+    deck.appendChild(card);
+  }
+}
+
+/* === THREE.JS HERO PARTICLES (FIXED FOR CORS) === */
 let heroParticlesMaterial;
 function initHeroParticles() {
-  const container = document.getElementById('hero-particles-container'); if (!container) return;
-  const scene = new THREE.Scene();
-  const width = container.offsetWidth; const height = container.offsetHeight;
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000); camera.position.z = 100;
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
-  
-  const img = new Image(); 
-  img.crossOrigin = "Anonymous"; 
-  img.src = 'images/hero-portrait.png'; 
-  
-  img.onload = () => {
-    const imageCanvas = document.createElement('canvas'); const ctx = imageCanvas.getContext('2d');
-    const particleDensity = window.innerWidth < 768 ? 6 : 4;
-    const iw = img.width; const ih = img.height;
-    imageCanvas.width = iw; imageCanvas.height = ih;
-    ctx.drawImage(img, 0, 0); const data = ctx.getImageData(0, 0, iw, ih).data;
-    const geometry = new THREE.BufferGeometry();
-    const positions = []; const colors = []; const randoms = [];
-    const ratio = window.innerWidth < 768 ? 0.15 : 0.25; 
-    for (let y = 0; y < ih; y += particleDensity) {
-      for (let x = 0; x < iw; x += particleDensity) {
-        const i = (y * iw + x) * 4;
-        const r = data[i] / 255; const g = data[i + 1] / 255; const b = data[i + 2] / 255; const a = data[i + 3];
-        if (a > 20 && (r+g+b) > 0.1) {
-          const px = (x - iw / 2) * ratio; const py = -(y - ih / 2) * ratio - 10;
-          positions.push(px, py, 0); colors.push(r, g, b);
-          randoms.push((Math.random()-0.5)*400, (Math.random()-0.5)*400, (Math.random()-0.5)*400);
-        }
-      }
-    }
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    geometry.setAttribute('aRandom', new THREE.Float32BufferAttribute(randoms, 3));
-    heroParticlesMaterial = new THREE.ShaderMaterial({
-      vertexShader: `uniform float uTime; uniform float uProgress; attribute vec3 aRandom; varying vec3 vColor; void main() { vColor = color; vec3 pos = mix(aRandom, position, uProgress); pos.x += sin(uTime * 2.0 + position.y) * 0.5 * uProgress; pos.z += cos(uTime * 1.5 + position.x) * 0.5 * uProgress; vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0); gl_PointSize = (3.0 * uProgress + 1.0) * (50.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,
-      fragmentShader: `varying vec3 vColor; void main() { float dist = length(gl_PointCoord - vec2(0.5)); if (dist > 0.5) discard; gl_FragColor = vec4(vColor, 1.0); }`,
-      uniforms: { uTime: { value: 0 }, uProgress: { value: 0 } },
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
-    });
-    const particles = new THREE.Points(geometry, heroParticlesMaterial);
-    if(window.innerWidth > 768) particles.position.x = 25; else particles.position.y = 10;
-    scene.add(particles);
-    const clock = new THREE.Clock();
-    function animate() { requestAnimationFrame(animate); const time = clock.getElapsedTime(); heroParticlesMaterial.uniforms.uTime.value = time; renderer.render(scene, camera); }
-    animate();
-  };
-  window.addEventListener('resize', () => { const w = container.offsetWidth; const h = container.offsetHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); });
+  const container = document.getElementById('hero-particles-container'); if (!container) return;
+  const scene = new THREE.Scene();
+  const width = container.offsetWidth; const height = container.offsetHeight;
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000); camera.position.z = 100;
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+  
+  const img = new Image(); 
+  img.crossOrigin = "Anonymous"; // FIX CORS
+  img.src = 'images/hero-portrait.png'; 
+  
+  img.onload = () => {
+    const imageCanvas = document.createElement('canvas'); const ctx = imageCanvas.getContext('2d');
+    const particleDensity = window.innerWidth < 768 ? 6 : 4;
+    const iw = img.width; const ih = img.height;
+    imageCanvas.width = iw; imageCanvas.height = ih;
+    ctx.drawImage(img, 0, 0); const data = ctx.getImageData(0, 0, iw, ih).data;
+    const geometry = new THREE.BufferGeometry();
+    const positions = []; const colors = []; const randoms = [];
+    const ratio = window.innerWidth < 768 ? 0.15 : 0.25; 
+    for (let y = 0; y < ih; y += particleDensity) {
+      for (let x = 0; x < iw; x += particleDensity) {
+        const i = (y * iw + x) * 4;
+        const r = data[i] / 255; const g = data[i + 1] / 255; const b = data[i + 2] / 255; const a = data[i + 3];
+        if (a > 20 && (r+g+b) > 0.1) {
+          const px = (x - iw / 2) * ratio; const py = -(y - ih / 2) * ratio - 10;
+          positions.push(px, py, 0); colors.push(r, g, b);
+          randoms.push((Math.random()-0.5)*400, (Math.random()-0.5)*400, (Math.random()-0.5)*400);
+        }
+      }
+    }
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geometry.setAttribute('aRandom', new THREE.Float32BufferAttribute(randoms, 3));
+    heroParticlesMaterial = new THREE.ShaderMaterial({
+      vertexShader: `uniform float uTime; uniform float uProgress; attribute vec3 aRandom; varying vec3 vColor; void main() { vColor = color; vec3 pos = mix(aRandom, position, uProgress); pos.x += sin(uTime * 2.0 + position.y) * 0.5 * uProgress; pos.z += cos(uTime * 1.5 + position.x) * 0.5 * uProgress; vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0); gl_PointSize = (3.0 * uProgress + 1.0) * (50.0 / -mvPosition.z); gl_Position = projectionMatrix * mvPosition; }`,
+      fragmentShader: `varying vec3 vColor; void main() { float dist = length(gl_PointCoord - vec2(0.5)); if (dist > 0.5) discard; gl_FragColor = vec4(vColor, 1.0); }`,
+      uniforms: { uTime: { value: 0 }, uProgress: { value: 0 } },
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
+    });
+    const particles = new THREE.Points(geometry, heroParticlesMaterial);
+    if(window.innerWidth > 768) particles.position.x = 25; else particles.position.y = 10;
+    scene.add(particles);
+    const clock = new THREE.Clock();
+    function animate() { requestAnimationFrame(animate); const time = clock.getElapsedTime(); heroParticlesMaterial.uniforms.uTime.value = time; renderer.render(scene, camera); }
+    animate();
+  };
+  window.addEventListener('resize', () => { const w = container.offsetWidth; const h = container.offsetHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); });
 }
 initHeroParticles();
 
 /* === BACKGROUND PARTICLES (Original) === */
 const initThreeJS = () => {
-  const canvas = document.querySelector('#webgl-canvas');
-  const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x000000, 0.001);
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 10;
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  const isMobile = window.innerWidth < 768; const count = isMobile ? 800 : 3000;
-  const particlesGeo = new THREE.BufferGeometry(); const posArray = new Float32Array(count * 3);
-  for(let i=0; i<count*3; i++) posArray[i] = (Math.random() - 0.5) * 40;
-  particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-  const material = new THREE.PointsMaterial({ size: 0.05, color: 0xD4AF37, transparent: true, opacity: 0.8 });
-  const particlesMesh = new THREE.Points(particlesGeo, material); scene.add(particlesMesh);
-  let mouseX = 0; let mouseY = 0;
-  document.addEventListener('mousemove', (event) => { mouseX = event.clientX - window.innerWidth / 2; mouseY = event.clientY - window.innerHeight / 2; });
-  const clock = new THREE.Clock();
-  const animate = () => { const elapsedTime = clock.getElapsedTime(); particlesMesh.rotation.y += 0.05 * (mouseX * 0.001 - particlesMesh.rotation.y); particlesMesh.rotation.x += 0.05 * (mouseY * 0.001 - particlesMesh.rotation.x); particlesMesh.rotation.z = elapsedTime * 0.02; renderer.render(scene, camera); requestAnimationFrame(animate); };
-  animate();
-  window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+  const canvas = document.querySelector('#webgl-canvas');
+  const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x000000, 0.001);
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); camera.position.z = 10;
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const isMobile = window.innerWidth < 768; const count = isMobile ? 800 : 3000;
+  const particlesGeo = new THREE.BufferGeometry(); const posArray = new Float32Array(count * 3);
+  for(let i=0; i<count*3; i++) posArray[i] = (Math.random() - 0.5) * 40;
+  particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+  const material = new THREE.PointsMaterial({ size: 0.05, color: 0xD4AF37, transparent: true, opacity: 0.8 });
+  const particlesMesh = new THREE.Points(particlesGeo, material); scene.add(particlesMesh);
+  let mouseX = 0; let mouseY = 0;
+  document.addEventListener('mousemove', (event) => { mouseX = event.clientX - window.innerWidth / 2; mouseY = event.clientY - window.innerHeight / 2; });
+  const clock = new THREE.Clock();
+  const animate = () => { const elapsedTime = clock.getElapsedTime(); particlesMesh.rotation.y += 0.05 * (mouseX * 0.001 - particlesMesh.rotation.y); particlesMesh.rotation.x += 0.05 * (mouseY * 0.001 - particlesMesh.rotation.x); particlesMesh.rotation.z = elapsedTime * 0.02; renderer.render(scene, camera); requestAnimationFrame(animate); };
+  animate();
+  window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 };
 
 /* === INPUT MASK === */
 document.querySelectorAll('input[type="tel"]').forEach(input => {
-  input.addEventListener('input', (e) => {
-    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
-    if (!x[2] && x[1] !== '') { e.target.value = '+7 (' + x[1]; }
-    else { e.target.value = !x[2] ? x[1] : '+7 (' + x[2] + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : ''); }
-  });
+  input.addEventListener('input', (e) => {
+    let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+    if (!x[2] && x[1] !== '') { e.target.value = '+7 (' + x[1]; }
+    else { e.target.value = !x[2] ? x[1] : '+7 (' + x[2] + (x[3] ? ') ' + x[3] : '') + (x[4] ? '-' + x[4] : '') + (x[5] ? '-' + x[5] : ''); }
+  });
 });
 </script>
 
 <script type="text/javascript">
-  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-  m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-  k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-  (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-  ym(104290205, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true, ecommerce:"dataLayer" });
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+  m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+  k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+  (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+  ym(104290205, "init", { clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true, ecommerce:"dataLayer" });
 </script>
 <noscript><div><img src="https://mc.yandex.ru/watch/104290205" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
 
