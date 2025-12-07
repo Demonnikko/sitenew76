@@ -21,7 +21,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
 <style>
-/* === КОМПАКТНЫЕ СТИЛИ === */
+/* === CSS СТИЛИ (КОМПАКТНЫЕ) === */
 :root {
   --bg: #050505;
   --bg-panel: rgba(20, 20, 22, 0.95);
@@ -30,29 +30,63 @@
   --gold-light: #F8E79B;
   --gold-dark: #8A6E2F;
   --gradient-gold: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
-  --container: min(1000px, 94vw); /* Чуть уже контейнер */
+  --container: min(1000px, 94vw);
   --ff-head: 'Cinzel', serif;
   --ff-body: 'Manrope', sans-serif;
-  --radius: 12px; /* Аккуратные скругления */
+  --radius: 12px;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; font-size: 14px; /* Базовый шрифт меньше */ }
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; font-size: 14px; }
 body {
   font-family: var(--ff-body); background: var(--bg); color: var(--text);
   line-height: 1.5; overflow-x: hidden; margin: 0;
-  height: 100vh; overflow-y: hidden;
+  height: 100vh; overflow-y: hidden; /* Блок скролла до загрузки */
 }
 body.loaded { overflow-y: auto; height: auto; }
 
-/* UTILS */
+/* 3D BACKGROUND */
+#webgl-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.6; }
+
+/* MAGIC CURSOR */
+.magic-cursor {
+  position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+  border: 1px solid var(--gold-primary); border-radius: 50%;
+  pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, background 0.3s, opacity 0.3s;
+  mix-blend-mode: exclusion;
+}
+.magic-cursor.hovered { width: 60px; height: 60px; background: rgba(212, 175, 55, 0.8); border-color: transparent; mix-blend-mode: normal; }
+@media (max-width: 900px) { .magic-cursor { display: none; } }
+
+/* PRELOADER */
+.curtain-wrapper {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; pointer-events: none;
+  background: transparent;
+  transition: opacity 1s ease, visibility 1s ease;
+}
+.curtain-wrapper.finished { opacity: 0; visibility: hidden; }
+.curtain-bg { position: absolute; inset: 0; background: #000; z-index: 1; transition: opacity 1s ease; }
+.curtain-spotlight { position: absolute; inset: 0; z-index: 5; background: radial-gradient(circle at 50% 40%, transparent 10%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.9) 100%); pointer-events: none; }
+.curtain-panel {
+  width: 50%; height: 100%; position: relative; z-index: 2;
+  background-color: #4a0404; 
+  background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(255,50,50,0.1) 25%, rgba(80,0,0,0.5) 35%, rgba(0,0,0,0.8) 50%);
+  box-shadow: inset 0 0 150px rgba(0,0,0,1); transform-origin: top; will-change: transform;
+}
+.curtain-content { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; width: 100%; perspective: 1000px; }
+.curtain-text { font-family: var(--ff-head); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; color: transparent; background: linear-gradient(to bottom, #FFF5C3 0%, #D4AF37 40%, #8A6E2F 100%); -webkit-background-clip: text; background-clip: text; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0; transform: scale(0.9); }
+.curtain-subtext { font-family: var(--ff-body); font-size: 0.9rem; color: var(--gold-light); text-transform: uppercase; letter-spacing: 0.3em; margin-top: 10px; opacity: 0; }
+
+/* UI UTILS */
 .container { width: var(--container); margin: 0 auto; position: relative; z-index: 2; }
-.section-py { padding-block: 40px; } /* Отступы меньше */
+.section-py { padding-block: 40px; }
 .text-gold { background: linear-gradient(to right, #D4AF37, #FFF5C3, #D4AF37); -webkit-background-clip: text; color: transparent; background-clip: text; font-weight: 700; }
 .text-center { text-align: center; }
 .icon-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
 
-/* BUTTONS (Компактные) */
+/* BUTTONS */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   padding: 10px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85rem;
@@ -97,6 +131,7 @@ label { display: block; margin-bottom: 5px; font-size: 0.75rem; color: #888; tex
   text-decoration: none; text-align: center; transition: 0.3s; position: relative; overflow: hidden;
   background: #111; cursor: pointer; display: block;
 }
+.nav-card:hover { transform: translateY(-3px); }
 .nav-card.gold { border-color: var(--gold-primary); background: linear-gradient(135deg, rgba(212,175,55,0.1), #000); }
 .nav-card.gold h3 { color: #fff; } .nav-card.gold span { color: var(--gold-primary); }
 .nav-card.silver { border-color: #555; background: linear-gradient(135deg, rgba(255,255,255,0.05), #000); }
@@ -104,15 +139,14 @@ label { display: block; margin-bottom: 5px; font-size: 0.75rem; color: #888; tex
 .nav-card h3 { font-family: var(--ff-head); font-size: 1.2rem; margin: 5px 0 0; line-height: 1.2; text-transform: uppercase; }
 .nav-card span { text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.2em; font-weight: 700; opacity: 0.8; }
 
-/* HERO (Compact) */
+/* HERO */
 .hero { height: 100dvh; min-height: 500px; display: flex; align-items: flex-end; padding-bottom: 90px; position: relative; overflow: hidden; }
 .hero-img {
   position: absolute; right: 0; bottom: 0; height: 100%; width: 100%;
   background-image: url('images/hero-portrait.png'); 
   background-size: contain; background-repeat: no-repeat; background-position: bottom center;
-  pointer-events: none; z-index: 1; opacity: 0; /* JS Animation */
+  pointer-events: none; z-index: 1; opacity: 0;
 }
-#webgl-canvas { position: absolute; top:0; left:0; width:100%; height:100%; z-index:0; opacity: 0.6; }
 @media (max-width: 768px) { 
     .hero { padding-bottom: 70px; align-items: center; justify-content: center; text-align: center; }
     .hero-img { width: 100%; height: 100%; background-size: cover; background-position: center top; opacity: 0.5; } 
@@ -121,33 +155,19 @@ label { display: block; margin-bottom: 5px; font-size: 0.75rem; color: #888; tex
 }
 
 .hero-content { max-width: 600px; position: relative; z-index: 3; margin-bottom: 0; width: 100%; }
-.hero-title { 
-  font-family: var(--ff-head); 
-  font-size: clamp(28px, 7vw, 56px); /* Уменьшил шрифт */
-  line-height: 1.1; margin-bottom: 12px; 
-}
-.hero-desc { 
-  font-size: 0.95rem; color: #ddd; 
-  text-shadow: 0 2px 5px rgba(0,0,0,0.9);
-  margin-bottom: 25px; max-width: 400px; margin-inline: auto;
-}
+.hero-title { font-family: var(--ff-head); font-size: clamp(28px, 7vw, 56px); line-height: 1.1; margin-bottom: 12px; }
+.hero-desc { font-size: 0.95rem; color: #ddd; text-shadow: 0 2px 5px rgba(0,0,0,0.9); margin-bottom: 25px; max-width: 400px; margin-inline: auto; }
 .hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
 
-/* PARTNERS (Compact) */
-.partners-section { 
-  padding: 25px 0; border-bottom: 1px solid #222; overflow: hidden; 
-  background: rgba(8,8,8,0.8); position:relative; z-index:2; 
-}
+/* PARTNERS */
+.partners-section { padding: 25px 0; border-bottom: 1px solid #222; overflow: hidden; background: rgba(8,8,8,0.8); position:relative; z-index:2; }
 .partners-track { display: flex; gap: 30px; width: max-content; animation: scrollLogos 30s linear infinite; }
 .partner-logo { height: 24px; width: auto; opacity: 0.9; flex-shrink: 0; display: block; }
 @keyframes scrollLogos { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-/* CARDS (Compact) */
+/* CARDS */
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; }
-.card {
-  padding: 20px; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
-  display: flex; flex-direction: column;
-}
+.card { padding: 20px; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; display: flex; flex-direction: column; }
 .card:hover { border-color: var(--gold-primary); }
 .card-icon-wrap { margin-bottom: 12px; color: var(--gold-primary); }
 .card h3 { font-family: var(--ff-head); font-size: 1.2rem; margin-bottom: 6px; color: #fff; }
@@ -155,11 +175,8 @@ label { display: block; margin-bottom: 5px; font-size: 0.75rem; color: #888; tex
 .card ul li { padding-left: 15px; margin-bottom: 5px; color: #aaa; list-style: none; position: relative; font-size: 0.85rem; }
 .card ul li::before { content: ''; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; background: var(--gold-primary); border-radius: 50%; }
 
-/* CALCULATOR (FIXED) */
-.wizard-box {
-  background: var(--bg-panel); border-radius: 16px; border: 1px solid #222; overflow: hidden;
-  min-height: 400px; display: flex; flex-direction: column;
-}
+/* CALCULATOR */
+.wizard-box { background: var(--bg-panel); border-radius: 16px; border: 1px solid #222; overflow: hidden; min-height: 400px; display: flex; flex-direction: column; }
 .wizard-progress { height: 3px; background: #222; width: 100%; }
 .progress-bar { height: 100%; background: var(--gradient-gold); width: 33%; transition: 0.5s; }
 .wizard-step { padding: 20px; display: none; flex: 1; flex-direction: column; animation: slideIn 0.3s ease; overflow-y: auto; }
@@ -172,47 +189,49 @@ label { display: block; margin-bottom: 5px; font-size: 0.75rem; color: #888; tex
 .svc-group-title { color: var(--gold-primary); font-family: var(--ff-head); text-transform: uppercase; font-size: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
 .svc-grid { display: grid; gap: 6px; grid-template-columns: 1fr; }
 @media (min-width: 500px) { .svc-grid { grid-template-columns: 1fr 1fr; } }
-.svc-btn {
-  background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 10px; border-radius: 8px;
-  cursor: pointer; display: flex; flex-direction: column; justify-content: center;
-}
+.svc-btn { background: rgba(255,255,255,0.05); border: 1px solid #333; padding: 10px; border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; }
 .svc-btn.selected { border-color: var(--gold-primary); background: rgba(212, 175, 55, 0.15); }
+.svc-btn.selected::after { content: '✓'; position: absolute; top: 10px; right: 10px; color: var(--gold-primary); font-weight: bold; font-size: 1rem; }
 .svc-name { font-weight: 700; color: #fff; font-size: 0.8rem; }
 .svc-cost { font-size: 0.75rem; color: var(--gold-primary); }
 
 .receipt { background: #000; padding: 15px; border-radius: 10px; border: 1px solid #333; margin-bottom: 15px; }
-.receipt-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 4px; color: #bbb; font-size: 0.8rem; }
+.receipt-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #333; padding-bottom: 4px; color: #bbb; font-size: 0.85rem; }
 .receipt-total { font-size: 1.4rem; color: var(--gold-primary); font-family: var(--ff-head); text-align: right; display: block; margin-top: 10px; }
 
 /* GAME */
 .game-section { text-align: center; border-block: 1px solid #222; background: rgba(0,0,0,0.6); padding: 30px 0; }
-.deck { display: flex; justify-content: center; gap: 8px; margin: 20px 0; perspective: 800px; }
+.deck { display: flex; justify-content: center; gap: 10px; margin: 20px 0; perspective: 800px; }
 .card-play { width: 70px; height: 100px; position: relative; transform-style: preserve-3d; transition: transform 0.6s; cursor: pointer; }
 .card-play.flipped { transform: rotateY(180deg); }
 .face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; background: #fff; }
 .back { background: linear-gradient(135deg, #111, #333); border: 2px solid var(--gold-primary); transform: rotateY(0deg); z-index: 2; }
 .front { transform: rotateY(180deg); color: #000; }
 
-/* FAQ & REVIEWS */
+/* REVIEWS */
+.reviews-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
+.tg-review-item { display: flex; flex-direction: column; align-items: center; width: 100px; }
+.tg-circle { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 2px solid var(--gold-primary); cursor: pointer; margin-bottom: 8px; flex-shrink: 0; }
+.tg-circle video { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.review-author { font-weight: 700; color: #fff; font-family: var(--ff-head); font-size: 0.9rem; text-align:center; }
+
+/* FAQ */
 .faq-grid { display: grid; gap: 10px; }
 details { background: var(--bg-panel); border: 1px solid #222; border-radius: 10px; padding: 12px; }
 details[open] { border-color: var(--gold-primary); }
-summary { font-weight: 700; cursor: pointer; color: #fff; font-size: 0.9rem; }
+summary { font-weight: 700; cursor: pointer; color: #fff; font-size: 0.9rem; padding-right: 20px; position: relative; list-style: none; }
+summary::after { content: '+'; position: absolute; right: 0; color: var(--gold-primary); }
+details[open] summary::after { content: '-'; }
 details p { margin-top: 8px; font-size: 0.85rem; color: #aaa; margin-bottom: 0; }
+.faq-item.hidden { display: none; }
 
-.reviews-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
-.tg-circle { width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 2px solid var(--gold-primary); cursor: pointer; margin-bottom: 8px; }
-.tg-circle video { width: 100%; height: 100%; object-fit: cover; }
+/* GALLERY */
+.gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.gallery-grid img { width: 100%; height: 140px; object-fit: cover; border-radius: 8px; filter: grayscale(30%); transition: 0.5s; cursor: pointer; background: #111; }
+.gallery-grid img:hover { filter: grayscale(0); }
 
 /* FOOTER */
 footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border-top: 1px solid #111; }
-
-/* PRELOADER */
-.curtain-wrapper { position: fixed; inset: 0; z-index: 10000; display: flex; pointer-events: none; background: transparent; }
-.curtain-bg { position: absolute; inset: 0; background: #000; z-index: 1; transition: opacity 0.5s; }
-.curtain-panel { width: 50%; height: 100%; position: relative; z-index: 2; background-color: #4a0404; background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(80,0,0,0.5) 15%, rgba(0,0,0,0.8) 50%); }
-.curtain-content { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center; width: 100%; }
-.curtain-text { font-family: var(--ff-head); font-size: clamp(2rem, 5vw, 4rem); font-weight: 900; color: transparent; background: linear-gradient(to bottom, #FFF5C3, #D4AF37); -webkit-background-clip: text; background-clip: text; }
 
 /* MODALS */
 .modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
@@ -223,34 +242,35 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
 <body>
 
 <div class="magic-cursor"></div>
+<canvas id="webgl-canvas"></canvas>
 
 <div class="curtain-wrapper">
   <div class="curtain-bg"></div>
+  <div class="curtain-spotlight"></div>
   <div class="curtain-panel left"></div>
   <div class="curtain-panel right"></div>
   <div class="curtain-content">
     <div class="curtain-text">KOSTYUK PROJECT</div>
+    <div class="curtain-subtext">Premium Magic Show</div>
   </div>
 </div>
-
-<canvas id="webgl-canvas"></canvas>
 
 <header class="header">
   <div class="container nav-flex">
     <a href="#" class="logo">KOSTYUK <span>PROJECT</span></a>
     <button class="burger" onclick="toggleMenu()">
-      <svg class="icon-svg" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      <svg class="icon-svg" style="width:32px;height:32px;" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
     </button>
   </div>
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="afisha.html" class="nav-card gold" onclick="toggleMenu()">
+  <a href="afisha.html" class="nav-card gold">
     <span>Корпоративы и Праздники</span>
     <h3>КОНЦЕРТНЫЕ ШОУ</h3>
   </a>
   <div style="height: 15px;"></div>
-  <a href="school.html" class="nav-card silver" onclick="toggleMenu()">
+  <a href="school.html" class="nav-card silver">
     <span>Обучение с нуля</span>
     <h3>ШКОЛА ФОКУСОВ</h3>
   </a>
@@ -261,7 +281,7 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
   <div class="container">
     <div class="hero-content">
       <h1 class="hero-title">Магия <br><span class="text-gold">Высокого Уровня</span></h1>
-      <p class="hero-desc">Премиальное шоу для тех, кто видел всё. Интеллектуально. Стильно.</p>
+      <p class="hero-desc">Премиальное шоу для тех, кто видел всё. Интеллектуально. Стильно. Дорого.</p>
       <div class="hero-btns">
         <button class="btn btn-glass" onclick="openVideo()">
           <svg class="icon-svg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
@@ -286,28 +306,28 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
       <img src="images/logo-perekrestok.png" class="partner-logo">
       <img src="images/logo-megafon.png" class="partner-logo">
       <img src="images/logo-danone.png" class="partner-logo">
-      <img src="images/logo-gazprom.png" class="partner-logo">
-      <img src="images/logo-chery.png" class="partner-logo">
-      <img src="images/logo-magnit.png" class="partner-logo">
     </div>
   </div>
 </div>
 
 <section id="formats" class="section-py">
   <div class="container">
-    <h2 class="text-center" style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:30px;">Форматы</h2>
+    <h2 class="text-center gs-reveal" style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:30px;">Форматы</h2>
     <div class="grid-cards">
       <div class="card">
+        <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M8 21h8m-4-4v4m0-4L3 6a2 2 0 0 1 1.7-3h14.6a2 2 0 0 1 1.7 3l-9 11z"></path></svg></div>
         <h3>Микромагия</h3>
         <span class="card-price">от 13 000 ₽</span>
         <ul><li>Welcome-зона</li><li>Фокусы в руках гостей</li></ul>
       </div>
       <div class="card" style="border-color:var(--gold-dark);">
+        <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></div>
         <h3>Сценическое шоу</h3>
         <span class="card-price">от 17 500 ₽</span>
         <ul><li>Интерактив с залом</li><li>Чтение мыслей</li></ul>
       </div>
       <div class="card">
+        <div class="card-icon-wrap"><svg class="icon-svg icon-large" viewBox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg></div>
         <h3>Шоу «СЕКРЕТ»</h3>
         <span class="card-price">от 150 000 ₽</span>
         <ul><li>Полноценный концерт</li><li>Атмосферный спектакль</li></ul>
@@ -317,7 +337,7 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
 </section>
 
 <section id="calc" class="section-py">
-  <div class="container">
+  <div class="container gs-reveal">
     <h2 class="text-center" style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:30px;">Калькулятор</h2>
     <div class="wizard-box">
       <div class="wizard-progress"><div class="progress-bar" id="wizProgress"></div></div>
@@ -329,7 +349,7 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
         <select id="city" class="input-field" disabled><option>Сначала область</option></select>
         <label>Дата</label>
         <input type="date" id="date" class="input-field">
-        <div class="wiz-controls"><button class="btn btn-primary" onclick="nextStep(2)" style="width:100%">Далее</button></div>
+        <div class="wiz-controls"><button class="btn btn-primary" onclick="nextStep(2)">Далее</button></div>
       </div>
       <div class="wizard-step" id="step2">
         <h3 class="step-title">2. Услуги</h3>
@@ -345,10 +365,7 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
         <h3 class="step-title text-center">Смета</h3>
         <div class="receipt">
           <div class="receipt-row"><span>Программа</span><strong id="rSvc" style="text-align:right">...</strong></div>
-          <div class="receipt-row"><span>Логистика</span><span id="rRoad">0 ₽</span></div>
-          <div class="receipt-row"><span>Гости</span><span id="rGuest">0 ₽</span></div>
-          <div class="receipt-row"><span>Сезонный коэф.</span><span id="rCoef">1.0</span></div>
-          <div class="receipt-total"><span id="rTotal">0 ₽</span></div>
+          <div class="receipt-row"><span>Итого</span><span id="rTotal" class="receipt-total">0 ₽</span></div>
         </div>
         <div class="wiz-controls"><a href="#order" class="btn btn-primary" style="width:100%">Забронировать</a><button class="btn btn-glass" onclick="nextStep(2)">Изменить</button></div>
       </div>
@@ -357,7 +374,7 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
 </section>
 
 <section class="section-py game-section">
-  <div class="container">
+  <div class="container gs-reveal">
     <h2 style="font-family:var(--ff-head); font-size:1.6rem;">Испытай удачу</h2>
     <p style="color:#888; font-size:0.9rem;">Найди <span style="color:#fff">Туза Пик</span> и получи скидку.</p>
     <div class="deck" id="gameDeck"></div>
@@ -366,18 +383,36 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
 </section>
 
 <section class="section-py">
-  <div class="container">
+  <div class="container gs-reveal">
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:30px;">Видео-отзывы</h2>
+    <div class="reviews-grid">
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-man-dancing-under-the-lights-1234-large.mp4" muted loop playsinline></video></div><div class="review-author">Александр</div></div>
+      <div class="tg-review-item"><div class="tg-circle" onclick="openReview(this)"><video src="https://assets.mixkit.co/videos/preview/mixkit-woman-holding-a-glass-of-wine-at-a-dinner-party-4549-large.mp4" muted loop playsinline></video></div><div class="review-author">Мария</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" class="section-py">
+  <div class="container gs-reveal">
+    <h2 class="text-center" style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:30px;">Галерея</h2>
+    <div class="gallery-grid" id="galGrid"></div>
+  </div>
+</section>
+
+<section class="section-py">
+  <div class="container gs-reveal">
     <h2 class="text-center" style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:30px;">Вопросы</h2>
     <div class="faq-grid" id="faqContainer"></div>
   </div>
 </section>
 
 <section id="order" class="section-py">
-  <div class="container" style="max-width:500px; text-align:center;">
+  <div class="container gs-reveal" style="max-width:500px; text-align:center;">
     <h2 style="font-family:var(--ff-head); font-size:1.8rem; margin-bottom:15px;">Связь</h2>
     <form id="tgForm">
       <input type="text" name="name" placeholder="Ваше Имя" class="input-field" required>
       <input type="tel" name="phone" placeholder="Телефон" class="input-field" required>
+      <textarea name="msg" placeholder="Комментарий / Дата" class="input-field" rows="3"></textarea>
       <button class="btn btn-primary" style="width:100%">Отправить</button>
     </form>
   </div>
@@ -387,9 +422,21 @@ footer { text-align:center; padding:20px 0; color:#444; font-size:0.7rem; border
 
 <div id="modalVideo" class="modal">
   <div class="modal-content" style="width:800px; aspect-ratio:16/9; background:#000; padding:0; border:none; position:relative;">
-    <button class="close-btn" onclick="closeVideo()" style="right:10px; top:10px;">×</button>
+    <button class="close-btn" onclick="closeVideo()" style="right:10px; top:10px; z-index:10; background:rgba(0,0,0,0.5); width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center;">×</button>
     <div id="vidContainer" style="width:100%; height:100%"></div>
   </div>
+</div>
+
+<div class="story-viewer" id="storyViewer" onclick="closeReview()">
+  <div class="story-content" onclick="event.stopPropagation()">
+    <button class="story-close" onclick="closeReview()">×</button>
+    <video id="storyVideo" class="story-video" src="" playsinline loop></video>
+  </div>
+</div>
+
+<div class="modal" id="modalImg" onclick="this.classList.remove('open')">
+  <button class="close-btn">×</button>
+  <img id="lbImg" src="" style="max-width:95vw; max-height:90vh; border-radius:8px;">
 </div>
 
 <script>
@@ -421,16 +468,30 @@ window.addEventListener("DOMContentLoaded", () => {
     updateServices();
     initGame();
     
-    // FAQ
+    // FAQ (FULL LIST)
     const faqData = [
         {q: "За сколько бронировать?", a: "Обычно за 1–2 недели."},
         {q: "Сколько длится шоу?", a: "От 20 мин до 2 часов."},
         {q: "Работаете по договору?", a: "Да, ИП/Самозанятость."},
-        {q: "Выезжаете в область?", a: "Да, условия в калькуляторе."}
+        {q: "Выезжаете в область?", a: "Да, условия в калькуляторе."},
+        {q: "Нужна ли сцена?", a: "Не обязательно, работаем и в welcome-зоне."},
+        {q: "Можно с детьми?", a: "Да, есть детские программы."},
+        {q: "Можно снимать видео?", a: "Да, конечно!"},
+        {q: "Какие условия оплаты?", a: "Предоплата 50%, остаток в день шоу."}
     ];
     document.getElementById('faqContainer').innerHTML = faqData.map((f,i) => 
         `<details class="faq-item"><summary>${f.q}</summary><div>${f.a}</div></details>`
     ).join('');
+
+    // Gallery
+    const galGrid = document.getElementById('galGrid');
+    for(let i=1; i<=6; i++){
+        const img = document.createElement('img'); 
+        img.src = `images/${i}.jpg`;
+        img.onerror = () => img.src = `https://via.placeholder.com/300x200/111/333?text=Photo+${i}`;
+        img.onclick = () => { document.getElementById('lbImg').src=img.src; document.getElementById('modalImg').classList.add('open'); };
+        galGrid.appendChild(img);
+    }
 });
 
 /* NAVIGATION */
@@ -451,14 +512,39 @@ function closeVideo(){
     document.getElementById('vidContainer').innerHTML = ''; 
 }
 
+/* REVIEW MODAL */
+function openReview(el) {
+    const src = el.querySelector('video').src;
+    const v = document.getElementById('storyVideo');
+    v.src = src; 
+    document.getElementById('storyViewer').classList.add('active');
+    v.play();
+}
+function closeReview() {
+    document.getElementById('storyViewer').classList.remove('active');
+    document.getElementById('storyVideo').pause();
+}
+
 /* CALCULATOR LOGIC (FIXED) */
 const travel={ "Вологодская":{fee:9000,cities:{Вологда:9000,Череповец:15000,Сокол:12000}}, "Владимирская":{fee:10000,cities:{Владимир:10000,Ковров:10000,Муром:17000,"Гусь хрустальный":13500}}, "Ивановская":{fee:5000,cities:{Иваново:2000,Кинешма:3500,Шуя:3000,Тейково:2500}}, "Костромская":{fee:3000,cities:{Кострома:2000,Шарья:6000,Нерехта:2000}}, "Ярославская":{fee:1000,cities:{Ярославль:0,Рыбинск:2000,Тутаев:2000,Углич:2000,Ростов:2000}} };
-const services={ close: { "Микромагия": 13000 }, std: { "Шоу": 17500 }, conc: { "Концерт": 150000 } };
-const catNames = { close: "Микромагия", std: "Шоу", conc: "Концерт" };
-const els={area:document.getElementById('area'),city:document.getElementById('city'),svcGrid:document.getElementById('svcOptions'),date:document.getElementById('date'),gRange:document.getElementById('gRange')};
-Object.keys(travel).forEach(k=>els.area.add(new Option(k,k)));
+const services={ 
+  close: { "Микромагия (30 мин)": 13000, "Микромагия (1 час)": 20000 }, 
+  std: { "Взрослое шоу (20 мин)": 17500, "Взрослое шоу (30 мин)": 23750 }, 
+  spec: { "Свадебное шоу": 26250 },
+  kids: { "Детское шоу": 11250 },
+  conc: { "Концерт (мини)": 150000, "Концерт (полный)": 300000 }
+};
+const catNames = { close: "Микромагия", std: "Сценическое шоу", spec: "Свадьбы", kids: "Детские", conc: "Концерт" };
 
-function updateCities(){els.city.innerHTML='<option disabled selected>Город</option>';els.city.disabled=false;Object.keys(travel[els.area.value].cities).forEach(c=>els.city.add(new Option(c,c)));}
+function updateCities(){
+    const area = document.getElementById('area').value;
+    const citySel = document.getElementById('city');
+    citySel.innerHTML='<option disabled selected>Город</option>';
+    citySel.disabled=false;
+    Object.keys(travel[area].cities).forEach(c=>citySel.add(new Option(c,c)));
+}
+
+Object.keys(travel).forEach(k=>document.getElementById('area').add(new Option(k,k)));
 
 let selectedServices = [];
 function updateServices(){
@@ -477,6 +563,7 @@ function updateServices(){
     wrapper.appendChild(g); grid.appendChild(wrapper);
   });
 }
+
 function toggleService(btn, name, price) {
   const idx = selectedServices.findIndex(s => s.name === name);
   if (idx > -1) { selectedServices.splice(idx, 1); btn.classList.remove('selected'); } 
@@ -484,7 +571,7 @@ function toggleService(btn, name, price) {
 }
 
 function nextStep(n){
-  if(n===2 && (!els.area.value||!els.city.value)){alert('Выберите регион и город');return;}
+  if(n===2 && (!document.getElementById('area').value||!document.getElementById('city').value)){alert('Выберите регион и город');return;}
   document.querySelectorAll('.wizard-step').forEach(e=>e.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   document.getElementById('wizProgress').style.width=(n*33)+'%';
@@ -493,11 +580,11 @@ function nextStep(n){
 function calcResult(){
   if (selectedServices.length === 0) { alert('Выберите услугу'); return; }
   let base = selectedServices.reduce((sum, s) => sum + s.price, 0);
-  const road = travel[els.area.value].cities[els.city.value];
-  const g = parseInt(els.gRange.value); 
+  const road = travel[document.getElementById('area').value].cities[document.getElementById('city').value];
+  const g = parseInt(document.getElementById('gRange').value); 
   const total = base + road + (g>50 ? (g-50)*50 : 0);
+  
   document.getElementById('rSvc').innerHTML = selectedServices.map(s => s.name).join('<br>');
-  document.getElementById('rRoad').innerText=road.toLocaleString()+' ₽';
   document.getElementById('rTotal').innerText=total.toLocaleString()+' ₽';
   nextStep(3);
 }
@@ -508,6 +595,12 @@ function initGame() {
     const msg = document.getElementById('gameMsg');
     if (!deck) return;
     deck.innerHTML = '';
+    
+    const lastPlayed = parseInt(localStorage.getItem('game_timestamp')) || 0;
+    if (Date.now() - lastPlayed < 24*60*60*1000) {
+        deck.innerHTML = `<div style="padding:15px; border:1px solid #333; border-radius:10px;"><h3>Попытка потрачена</h3></div>`;
+        return;
+    }
     const winIdx = Math.floor(Math.random() * 3);
     for (let i = 0; i < 3; i++) {
         const isWin = (i === winIdx);
@@ -515,14 +608,15 @@ function initGame() {
         card.innerHTML = `<div class="face back"></div><div class="face front" style="color:#000">${isWin ? 'A♠' : 'J♥'}</div>`;
         card.onclick = () => {
             document.querySelectorAll('.card-play').forEach(el => el.classList.add('flipped'));
-            if (isWin) { msg.innerText = 'ПОБЕДА! Скидка 20%'; } 
-            else { msg.innerText = 'Увы...'; }
+            if (isWin) { msg.innerText = 'ПОБЕДА! Скидка 20%'; localStorage.setItem('game_win', 'true'); } 
+            else { msg.innerText = 'Увы...'; localStorage.setItem('game_win', 'false'); }
+            localStorage.setItem('game_timestamp', Date.now());
         };
         deck.appendChild(card);
     }
 }
 
-/* PARTICLES */
+/* PARTICLES (Light) */
 function initThreeJS() {
   const container = document.getElementById('webgl-canvas');
   if(!container) return;
